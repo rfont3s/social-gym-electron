@@ -6,7 +6,6 @@ import {
   FitnessCenter,
   SportsMartialArts,
   DirectionsRun,
-  Pool,
   MonitorWeight,
   SportsGymnastics,
 } from '@mui/icons-material';
@@ -36,22 +35,19 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ data }) => {
 
         {/* Floating Gym Icons */}
         <div className='absolute top-20 left-20 text-primary-500/20 dark:text-primary-400/20 animate-pulse'>
-          <FitnessCenter sx={{ fontSize: 48 }} />
+          <FitnessCenter sx={{ fontSize: 64 }} />
         </div>
         <div className='absolute top-32 right-32 text-secondary-500/15 dark:text-secondary-400/15 animate-pulse delay-1000'>
-          <DirectionsRun sx={{ fontSize: 40 }} />
+          <DirectionsRun sx={{ fontSize: 56 }} />
         </div>
         <div className='absolute bottom-32 left-16 text-primary-500/10 dark:text-primary-400/10 animate-pulse delay-2000'>
-          <MonitorWeight sx={{ fontSize: 44 }} />
+          <MonitorWeight sx={{ fontSize: 60 }} />
         </div>
         <div className='absolute bottom-20 right-20 text-secondary-500/20 dark:text-secondary-400/20 animate-pulse delay-500'>
-          <SportsGymnastics sx={{ fontSize: 36 }} />
+          <SportsGymnastics sx={{ fontSize: 52 }} />
         </div>
         <div className='absolute top-1/2 left-8 text-primary-500/15 dark:text-primary-400/15 animate-pulse delay-1500'>
-          <SportsMartialArts sx={{ fontSize: 42 }} />
-        </div>
-        <div className='absolute top-1/3 right-8 text-secondary-500/10 dark:text-secondary-400/10 animate-pulse delay-700'>
-          <Pool sx={{ fontSize: 38 }} />
+          <SportsMartialArts sx={{ fontSize: 58 }} />
         </div>
 
         {/* Additional decorative elements */}

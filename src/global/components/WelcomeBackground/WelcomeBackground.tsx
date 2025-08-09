@@ -3,7 +3,6 @@ import {
   FitnessCenter,
   SportsMartialArts,
   DirectionsRun,
-  Pool,
   MonitorWeight,
   SportsGymnastics,
   AccessTime,
@@ -25,33 +24,30 @@ export const WelcomeBackground: React.FC = () => {
 
       {/* Floating Gym Equipment Icons */}
       <div className='absolute top-16 left-20 text-primary-500/25 dark:text-primary-400/25 animate-pulse'>
-        <FitnessCenter sx={{ fontSize: 64 }} />
+        <FitnessCenter sx={{ fontSize: 72 }} />
       </div>
       <div className='absolute top-24 right-32 text-secondary-500/20 dark:text-secondary-400/20 animate-pulse delay-1000'>
-        <DirectionsRun sx={{ fontSize: 56 }} />
+        <DirectionsRun sx={{ fontSize: 64 }} />
       </div>
       <div className='absolute bottom-32 left-16 text-primary-500/15 dark:text-primary-400/15 animate-pulse delay-2000'>
-        <MonitorWeight sx={{ fontSize: 60 }} />
+        <MonitorWeight sx={{ fontSize: 68 }} />
       </div>
       <div className='absolute bottom-20 right-24 text-secondary-500/25 dark:text-secondary-400/25 animate-pulse delay-500'>
-        <SportsGymnastics sx={{ fontSize: 52 }} />
+        <SportsGymnastics sx={{ fontSize: 60 }} />
       </div>
       <div className='absolute top-1/2 left-12 text-primary-500/20 dark:text-primary-400/20 animate-pulse delay-1500'>
-        <SportsMartialArts sx={{ fontSize: 58 }} />
-      </div>
-      <div className='absolute top-1/3 right-12 text-secondary-500/15 dark:text-secondary-400/15 animate-pulse delay-700'>
-        <Pool sx={{ fontSize: 54 }} />
+        <SportsMartialArts sx={{ fontSize: 66 }} />
       </div>
 
       {/* Additional Activity Icons */}
       <div className='absolute top-40 left-1/2 -translate-x-1/2 text-primary-500/10 dark:text-primary-400/10 animate-pulse delay-300'>
-        <AccessTime sx={{ fontSize: 48 }} />
+        <AccessTime sx={{ fontSize: 54 }} />
       </div>
       <div className='absolute bottom-40 left-1/3 text-secondary-500/12 dark:text-secondary-400/12 animate-pulse delay-1200'>
-        <Group sx={{ fontSize: 50 }} />
+        <Group sx={{ fontSize: 56 }} />
       </div>
       <div className='absolute top-1/4 left-1/4 text-primary-500/8 dark:text-primary-400/8 animate-pulse delay-900'>
-        <TrendingUp sx={{ fontSize: 46 }} />
+        <TrendingUp sx={{ fontSize: 52 }} />
       </div>
 
       {/* Decorative geometric shapes */}
