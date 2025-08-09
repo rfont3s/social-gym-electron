@@ -9,7 +9,7 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.cjs'),
-      webSecurity: true,
+      webSecurity: true, // Restaurar segurança web
       allowRunningInsecureContent: false,
       experimentalFeatures: false,
     },
@@ -25,7 +25,7 @@ function createWindow() {
 
   if (isDev) {
     mainWindow.loadURL('http://localhost:5173');
-    
+
     // DevTools podem ser abertos manualmente com F12 ou Ctrl+Shift+I
     // para evitar warnings de Autofill no console
     // mainWindow.webContents.openDevTools();

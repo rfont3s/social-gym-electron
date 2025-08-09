@@ -18,13 +18,19 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@components": ["src/components/index.ts"],
-      "@components/*": ["src/components/*"],
+      "@components": ["src/global/components/index.ts"],
+      "@components/*": ["src/global/components/*"],
       "@pages": ["src/pages/index.ts"],
       "@pages/*": ["src/pages/*"],
       "@hooks/*": ["src/hooks/*"],
       "@contexts/*": ["src/contexts/*"],
       "@assets/*": ["src/assets/*"],
+      "@schemas/*": ["src/schemas/*"],
+      "@config/*": ["src/config/*"],
+      "@constants/*": ["src/constants/*"],
+      "@utils/*": ["src/utils/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@views/*": ["src/views/*"],
       "@/*": ["src/*"]
     },
 
