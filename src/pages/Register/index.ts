@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@hooks/useTheme';
 import { useAuth } from '@hooks/useAuth';
 import { AuthController } from '@controllers/AuthController';
@@ -41,6 +42,7 @@ interface RegisterProps {
 export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const { mode, toggleTheme } = useTheme();
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -64,6 +66,8 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     try {
       const { token, user } = await AuthController.register(data);
       login(token, user);
+      // Navegar para o dashboard após registro bem-sucedido
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta');
     } finally {
@@ -98,5 +102,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   };
 
   // Usando createElement para criar a view e passar as props
-  return React.createElement(RegisterView, { data: registerData } as React.ComponentProps<typeof RegisterView>);
+  return React.createElement(RegisterView, {
+    data: registerData,
+  } as React.ComponentProps<typeof RegisterView>);
 };

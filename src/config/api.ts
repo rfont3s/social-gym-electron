@@ -19,14 +19,14 @@ export const apiClient = axios.create({
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': 'application/json',
-    'Accept': 'application/json',
+    Accept: 'application/json',
   },
   withCredentials: true, // Restaurar para enviar cookies/credenciais
 });
 
 // Interceptor para requisições (adiciona token automaticamente)
 apiClient.interceptors.request.use(
-  (config) => {
+  config => {
     // Pega o token do localStorage se existir
     const token = localStorage.getItem('access_token');
     if (token && config.headers) {
@@ -34,17 +34,17 @@ apiClient.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
+  error => {
     return Promise.reject(error);
   }
 );
 
 // Interceptor para respostas (trata erros de autenticação)
 apiClient.interceptors.response.use(
-  (response) => {
+  response => {
     return response;
   },
-  (error) => {
+  error => {
     // Se token expirado/inválido, limpar localStorage
     if (error.response?.status === 401) {
       localStorage.removeItem('access_token');
@@ -62,10 +62,7 @@ export const buildApiUrl = (endpoint: string): string => {
 };
 
 // Função utilitária para fazer requisições (agora com Axios)
-export const apiRequest = async (
-  endpoint: string, 
-  config = {}
-) => {
+export const apiRequest = async (endpoint: string, config = {}) => {
   try {
     const response = await apiClient.request({
       url: endpoint,
@@ -80,19 +77,17 @@ export const apiRequest = async (
 
 // Métodos HTTP específicos para facilitar o uso
 export const api = {
-  get: (url: string, config = {}) => 
-    apiClient.get(url, config),
-  
-  post: (url: string, data = {}, config = {}) => 
+  get: (url: string, config = {}) => apiClient.get(url, config),
+
+  post: (url: string, data = {}, config = {}) =>
     apiClient.post(url, data, config),
-    
-  put: (url: string, data = {}, config = {}) => 
+
+  put: (url: string, data = {}, config = {}) =>
     apiClient.put(url, data, config),
-    
-  delete: (url: string, config = {}) => 
-    apiClient.delete(url, config),
-    
-  patch: (url: string, data = {}, config = {}) => 
+
+  delete: (url: string, config = {}) => apiClient.delete(url, config),
+
+  patch: (url: string, data = {}, config = {}) =>
     apiClient.patch(url, data, config),
 };
 

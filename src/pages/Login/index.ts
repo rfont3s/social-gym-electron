@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@hooks/useAuth';
 import { useTheme } from '@hooks/useTheme';
 import { AuthController } from '@controllers/AuthController';
@@ -38,6 +39,7 @@ interface LoginProps {
 export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   const { mode, toggleTheme } = useTheme();
   const { login } = useAuth();
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -58,6 +60,8 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
     try {
       const { token, user } = await AuthController.login(data);
       login(token, user);
+      // Navegar para o dashboard após login bem-sucedido
+      navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {
@@ -89,5 +93,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
   };
 
   // Usando createElement para criar a view e passar as props
-  return React.createElement(LoginView, { data: loginData } as React.ComponentProps<typeof LoginView>);
+  return React.createElement(LoginView, {
+    data: loginData,
+  } as React.ComponentProps<typeof LoginView>);
 };

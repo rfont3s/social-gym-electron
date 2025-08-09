@@ -4,3 +4,4 @@ export { FormInput } from './FormInput';
 export { Input } from './Input';
 export { AuthHeader } from './AuthHeader';
 export { AuthComponent } from './AuthComponent';
+export { AppRouter } from './Router';

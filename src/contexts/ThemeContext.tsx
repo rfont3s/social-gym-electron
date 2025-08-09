@@ -18,21 +18,33 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [mode, setMode] = useState<ThemeMode>('light');
-
-  // Initialize theme on mount
-  useEffect(() => {
+  // Inicializar com o tema salvo ou detectar preferência do sistema
+  const getInitialTheme = (): ThemeMode => {
+    // Primeiro, verificar se há tema salvo no localStorage
     const savedTheme = localStorage.getItem('theme-preference') as ThemeMode;
-    const initialMode = savedTheme || 'light';
-    setMode(initialMode);
-
-    // Apply initial theme class to document
-    if (initialMode === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+      return savedTheme;
     }
-  }, []);
+
+    // Se não há tema salvo, verificar preferência do sistema
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+
+    return 'light';
+  };
+
+  const [mode, setMode] = useState<ThemeMode>(getInitialTheme);
+
+  // Aplicar tema inicial imediatamente na inicialização
+  useEffect(() => {
+    // Aplicar classe do tema ao documento
+    document.documentElement.classList.remove('light', 'dark');
+    document.documentElement.classList.add(mode);
+
+    // Garantir que o tema seja salvo no localStorage
+    localStorage.setItem('theme-preference', mode);
+  }, [mode]);
 
   const toggleTheme = () => {
     const newMode = mode === 'light' ? 'dark' : 'light';
@@ -42,20 +54,6 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   const setTheme = (newMode: ThemeMode) => {
     setMode(newMode);
   };
-
-  useEffect(() => {
-    // Save theme preference
-    localStorage.setItem('theme-preference', mode);
-
-    // Apply theme class to document
-    if (mode === 'dark') {
-      document.documentElement.classList.remove('light');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-    }
-  }, [mode]);
 
   return (
     <ThemeContext.Provider value={{ mode, toggleTheme, setTheme }}>
