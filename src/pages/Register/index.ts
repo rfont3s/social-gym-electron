@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useNavigate } from 'react-router-dom';
-import { useTheme } from '@hooks/useTheme';
-import { useAuth } from '@hooks/useAuth';
+import { useAuth } from '@/global/hooks/useAuth';
+import { useTheme } from '@/global/hooks/useTheme';
 import { AuthController } from '@controllers/AuthController';
+import { yupResolver } from '@hookform/resolvers/yup';
 import type { RegisterFormData } from '@schemas/validationSchemas';
 import { registerSchema } from '@schemas/validationSchemas';
+import React, { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import { RegisterView } from './view';
 
 export interface RegisterData {

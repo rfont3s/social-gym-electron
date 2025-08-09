@@ -1,6 +1,6 @@
-import React from 'react';
-import { useTheme } from '@hooks/useTheme';
+import { useTheme } from '@/global/hooks/useTheme';
 import { DarkMode, LightMode } from '@mui/icons-material';
+import React from 'react';
 
 interface AuthHeaderProps {
   title: string;
@@ -8,10 +8,10 @@ interface AuthHeaderProps {
   showThemeToggle?: boolean;
 }
 
-export const AuthHeader: React.FC<AuthHeaderProps> = ({ 
-  title, 
-  subtitle, 
-  showThemeToggle = true 
+export const AuthHeader: React.FC<AuthHeaderProps> = ({
+  title,
+  subtitle,
+  showThemeToggle = true,
 }) => {
   const { mode, toggleTheme } = useTheme();
 
@@ -41,9 +41,7 @@ export const AuthHeader: React.FC<AuthHeaderProps> = ({
         <h1 className='text-2xl font-bold text-gray-900 dark:text-white'>
           {title}
         </h1>
-        <p className='text-gray-600 dark:text-gray-400 mt-2'>
-          {subtitle}
-        </p>
+        <p className='text-gray-600 dark:text-gray-400 mt-2'>{subtitle}</p>
       </div>
     </>
   );

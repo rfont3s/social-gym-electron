@@ -1,7 +1,8 @@
+export { AppRouter } from '../Router';
+export { AuthComponent } from './AuthComponent';
+export { AuthHeader } from './AuthHeader';
 export { Button } from './Button';
 export { Card } from './Card';
 export { FormInput } from './FormInput';
 export { Input } from './Input';
-export { AuthHeader } from './AuthHeader';
-export { AuthComponent } from './AuthComponent';
-export { AppRouter } from './Router';
+export { WelcomeBackground } from './WelcomeBackground';

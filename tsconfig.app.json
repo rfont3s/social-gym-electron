@@ -22,7 +22,7 @@
       "@components/*": ["src/global/components/*"],
       "@pages": ["src/pages/index.ts"],
       "@pages/*": ["src/pages/*"],
-      "@hooks/*": ["src/hooks/*"],
+      "@hooks/*": ["src/global/hooks/*"],
       "@contexts/*": ["src/contexts/*"],
       "@assets/*": ["src/assets/*"],
       "@schemas/*": ["src/schemas/*"],

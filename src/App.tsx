@@ -1,7 +1,7 @@
-import { BrowserRouter } from 'react-router-dom';
+import { AppRouter } from '@/global/Router';
 import { AuthProvider } from '@contexts/AuthContext';
 import { ThemeProvider } from '@contexts/ThemeContext';
-import { AppRouter } from '@components/Router';
+import { BrowserRouter } from 'react-router-dom';
 
 function App() {
   return (

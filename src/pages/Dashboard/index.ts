@@ -1,5 +1,5 @@
-import { useAuth } from '@hooks/useAuth';
-import { useTheme } from '@hooks/useTheme';
+import { useAuth } from '@/global/hooks/useAuth';
+import { useTheme } from '@/global/hooks/useTheme';
 import React from 'react';
 import { DashboardView } from './view';
 
