@@ -1,6 +1,7 @@
 import React from 'react';
 import { DarkMode, LightMode } from '@mui/icons-material';
 import { Button } from '@components';
+import logo from '../../../assets/logo.svg';
 
 interface DashboardHeaderProps {
   user: {
@@ -23,13 +24,28 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
       <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
         <div className='flex items-center justify-between h-16'>
           <div className='flex items-center space-x-4'>
-            <div className='w-10 h-10 bg-primary-500 rounded-lg flex items-center justify-center text-white font-bold'>
-              SG
-            </div>
-            <div>
-              <h1 className='text-xl font-bold text-gray-900 dark:text-white'>
-                Social Gym
-              </h1>
+            <img
+              src={logo}
+              alt='Social Gym Logo'
+              className='h-10 w-auto object-contain dark:invert'
+            />
+            <div className='flex items-center space-x-2'>
+              <div className='w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white text-xs font-medium'>
+                {user?.name
+                  ? (() => {
+                      const nameParts = user.name.trim().split(' ');
+                      const firstInitial =
+                        nameParts[0]?.charAt(0).toUpperCase() || '';
+                      const lastInitial =
+                        nameParts.length > 1
+                          ? nameParts[nameParts.length - 1]
+                              ?.charAt(0)
+                              .toUpperCase()
+                          : '';
+                      return firstInitial + lastInitial;
+                    })()
+                  : 'U'}
+              </div>
               <p className='text-sm text-gray-600 dark:text-gray-400'>
                 Olá, {user?.name || 'Usuário'}!
               </p>

@@ -1,12 +1,12 @@
-import React from 'react';
-import { Button, Card, Background } from '@components';
+import { Background, Button, Card } from '@components';
 import { INFO_MESSAGES } from '@constants/messages';
 import { Lock } from '@mui/icons-material';
+import React from 'react';
 import {
-  LoginHeader,
-  LoginFormFields,
-  SocialLogin,
   LoginFooter,
+  LoginFormFields,
+  LoginHeader,
+  SocialLogin,
 } from './components';
 import type { LoginData } from './index';
 
@@ -29,7 +29,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ data }) => {
 
         <Card
           variant='elevated'
-          className='backdrop-blur-sm border border-white/20 dark:border-gray-700/50 relative z-10 shadow-2xl'
+          className='backdrop-blur-sm border border-white/20 dark:border-gray-700/50 relative z-10 shadow-2xl p-10'
         >
           {/* Subtle gym pattern overlay */}
           <div className='absolute top-4 right-4 text-primary-500/10 dark:text-primary-400/10'>

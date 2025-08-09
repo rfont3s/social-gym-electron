@@ -1,5 +1,6 @@
 import React from 'react';
 import { DarkMode, LightMode } from '@mui/icons-material';
+import logo from '../../../assets/logo.svg';
 
 interface RegisterHeaderProps {
   theme: {
@@ -14,13 +15,12 @@ export const RegisterHeader: React.FC<RegisterHeaderProps> = ({ theme }) => {
       {/* Header */}
       <div className='text-center mb-8'>
         <div className='flex items-center justify-center mb-4'>
-          <div className='w-16 h-16 rounded-2xl flex items-center justify-center text-white text-2xl font-bold bg-primary-500'>
-            SG
-          </div>
+          <img
+            src={logo}
+            alt='Social Gym Logo'
+            className='h-60 w-auto object-contain dark:invert'
+          />
         </div>
-        <h1 className='text-3xl font-bold text-gray-900 dark:text-white mb-2'>
-          Social Gym
-        </h1>
         <p className='text-sm text-gray-600 dark:text-gray-400'>
           Crie sua conta para começar
         </p>

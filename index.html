@@ -4,16 +4,24 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins&display=swap"
+      rel="stylesheet"
+    />
+
     <title>Social Gymn</title>
-    
+
     <!-- Script para aplicar o tema antes do React carregar -->
     <script>
-      (function() {
+      (function () {
         try {
           const savedTheme = localStorage.getItem('theme-preference');
-          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
+            .matches
+            ? 'dark'
+            : 'light';
           const theme = savedTheme || systemTheme;
-          
+
           document.documentElement.classList.remove('light', 'dark');
           document.documentElement.classList.add(theme);
         } catch (e) {
