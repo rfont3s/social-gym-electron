@@ -55,7 +55,7 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
     formState: { errors, isValid },
   } = useForm<RegisterFormData>({
     resolver: yupResolver(registerSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const onSubmit = async (data: RegisterFormData) => {

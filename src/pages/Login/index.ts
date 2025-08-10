@@ -50,7 +50,7 @@ export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
     formState: { errors, isValid },
   } = useForm<LoginFormData>({
     resolver: yupResolver(loginSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
   });
 
   const onSubmit = async (data: LoginFormData) => {

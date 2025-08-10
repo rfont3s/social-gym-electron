@@ -1,17 +1,17 @@
-import React from 'react';
 import { Card } from '@components';
 import {
-  Schedule,
-  DarkMode,
   Assessment,
+  DarkMode,
   FitnessCenter,
+  Schedule,
 } from '@mui/icons-material';
+import React from 'react';
 
 export const WelcomeCard: React.FC = () => {
   return (
     <Card variant='elevated' className='text-center'>
       <h2 className='text-2xl font-bold mb-4 text-gray-900 dark:text-white'>
-        Bem-vindo ao Social Gym! 🎉
+        Bem-vindo ao Worknnect! 🎉
       </h2>
       <p className='text-lg mb-6 text-gray-600 dark:text-gray-400'>
         Sua aplicação Electron está funcionando perfeitamente com React,
@@ -31,9 +31,7 @@ export const WelcomeCard: React.FC = () => {
           <div className='flex justify-center mb-2'>
             <DarkMode className='text-secondary-500' fontSize='large' />
           </div>
-          <p className='font-medium text-gray-900 dark:text-white'>
-            Dark Mode
-          </p>
+          <p className='font-medium text-gray-900 dark:text-white'>Dark Mode</p>
         </div>
         <div className='p-4'>
           <div className='flex justify-center mb-2'>

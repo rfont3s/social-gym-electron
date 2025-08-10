@@ -1,11 +1,11 @@
-import React from 'react';
-import { Button, Card, Background } from '@components';
+import { Button } from '@components';
 import { INFO_MESSAGES } from '@constants/messages';
 import { PersonAdd } from '@mui/icons-material';
+import React from 'react';
 import {
-  RegisterHeader,
-  RegisterFormFields,
   RegisterFooter,
+  RegisterFormFields,
+  RegisterHeader,
 } from './components';
 import type { RegisterData } from './index';
 
@@ -17,24 +17,50 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ data }) => {
   const { form, state, theme, actions } = data;
 
   return (
-    <div className='min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-300'>
-      {/* Enhanced Background Pattern with Gym Icons */}
-      <Background />
-
-      {/* Register Card */}
-      <div className='relative w-full max-w-md'>
-        {/* Card glow effect */}
-        <div className='absolute inset-0 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-2xl blur-xl opacity-30'></div>
-
-        <Card
-          variant='elevated'
-          className='backdrop-blur-sm border border-white/20 dark:border-gray-700/50 relative z-10 shadow-2xl'
-        >
-          {/* Subtle gym pattern overlay */}
-          <div className='absolute top-4 right-4 text-primary-500/10 dark:text-primary-400/10'>
-            <PersonAdd sx={{ fontSize: 24 }} />
+    <div className='min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300'>
+      {/* Left Side - Image/Illustration */}
+      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-secondary-500 to-primary-500 relative overflow-hidden'>
+        {/* Gym themed background */}
+        <div className='absolute inset-0 bg-black/20'></div>
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div className='text-center text-white z-10'>
+            <div className='mb-8'></div>
+            <h1 className='text-5xl font-bold mb-4'>Junte-se</h1>
+            <p className='text-4xl opacity-90 max-w-lg'>
+              Faça parte da maior comunidade de Treinos e Conexões. Compartilhe,
+              conecte e evolua!
+            </p>
           </div>
-          <RegisterHeader theme={theme} />
+        </div>
+
+        {/* Decorative elements */}
+        <div className='absolute top-32 right-20 w-28 h-28 rounded-full bg-white/10 animate-pulse'></div>
+        <div className='absolute bottom-32 left-20 w-20 h-20 rounded-full bg-white/10 animate-pulse delay-1000'></div>
+        <div className='absolute top-1/3 left-10 w-14 h-14 rounded-full bg-white/10 animate-pulse delay-500'></div>
+      </div>
+
+      {/* Right Side - Register Form */}
+      <div className='w-full lg:w-1/2 flex items-center justify-center p-8'>
+        <div className='w-full max-w-md space-y-8'>
+          {/* Mobile Logo - only shown on small screens */}
+          <div className='lg:hidden text-center mb-8'>
+            <img
+              src='/src/assets/logo.svg'
+              alt='Social Gym Logo'
+              className='w-50 object-contain dark:invert'
+            />
+            <h1 className='text-2xl font-bold text-gray-900 dark:text-white mt-4'>
+              Social Gym
+            </h1>
+            <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>
+              Crie sua conta para começar
+            </p>
+          </div>
+
+          {/* Register Header for desktop */}
+          <div className='hidden lg:block'>
+            <RegisterHeader theme={theme} />
+          </div>
 
           {/* Form */}
           <form
@@ -59,11 +85,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ data }) => {
             )}
 
             {/* Register Button */}
-            <Button
-              type='submit'
-              disabled={state.isLoading || !form.isValid}
-              className='w-full'
-            >
+            <Button type='submit' disabled={state.isLoading} className='w-full'>
               {state.isLoading ? (
                 <div className='flex items-center justify-center'>
                   <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2' />
@@ -81,7 +103,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ data }) => {
           <RegisterFooter
             onSwitchToLogin={actions.onSwitchToLogin || (() => {})}
           />
-        </Card>
+        </div>
       </div>
     </div>
   );

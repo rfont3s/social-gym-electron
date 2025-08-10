@@ -21,9 +21,6 @@ export const LoginHeader: React.FC<LoginHeaderProps> = ({ theme }) => {
             className='w-50 object-contain dark:invert'
           />
         </div>
-        <p className='text-sm text-gray-600 dark:text-gray-400'>
-          Entre na sua conta para continuar
-        </p>
       </div>
 
       {/* Theme Toggle */}

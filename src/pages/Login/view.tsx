@@ -1,4 +1,4 @@
-import { Background, Button, Card } from '@components';
+import { Button } from '@components';
 import { INFO_MESSAGES } from '@constants/messages';
 import { Lock } from '@mui/icons-material';
 import React from 'react';
@@ -18,24 +18,48 @@ export const LoginView: React.FC<LoginViewProps> = ({ data }) => {
   const { form, state, theme, actions } = data;
 
   return (
-    <div className='min-h-screen flex items-center justify-center p-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-300'>
-      {/* Enhanced Background Pattern with Gym Icons */}
-      <Background />
-
-      {/* Login Card */}
-      <div className='relative w-full max-w-md'>
-        {/* Card glow effect */}
-        <div className='absolute inset-0 bg-gradient-to-r from-primary-500/20 to-secondary-500/20 rounded-2xl blur-xl opacity-30'></div>
-
-        <Card
-          variant='elevated'
-          className='backdrop-blur-sm border border-white/20 dark:border-gray-700/50 relative z-10 shadow-2xl p-10'
-        >
-          {/* Subtle gym pattern overlay */}
-          <div className='absolute top-4 right-4 text-primary-500/10 dark:text-primary-400/10'>
-            <Lock sx={{ fontSize: 24 }} />
+    <div className='min-h-screen flex bg-gray-50 dark:bg-gray-900 transition-colors duration-300'>
+      {/* Left Side - Image/Illustration */}
+      <div className='hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary-500 to-secondary-500 relative overflow-hidden'>
+        {/* Gym themed background */}
+        <div className='absolute inset-0 bg-black/20'></div>
+        <div className='absolute inset-0 flex items-center justify-center'>
+          <div className='text-center text-white z-10'>
+            <p className='text-4xl opacity-90 max-w-lg'>
+              Conecte-se com outros atletas, compartilhe seus treinos e
+              conquiste seus objetivos. Inspire-se nos profissionais do esporte
+              e leve sua performance ao próximo nível.
+            </p>
           </div>
-          <LoginHeader theme={theme} />
+        </div>
+
+        {/* Decorative elements */}
+        <div className='absolute top-20 left-20 w-32 h-32 rounded-full bg-white/10 animate-pulse'></div>
+        <div className='absolute bottom-20 right-20 w-24 h-24 rounded-full bg-white/10 animate-pulse delay-1000'></div>
+        <div className='absolute top-1/2 right-10 w-16 h-16 rounded-full bg-white/10 animate-pulse delay-500'></div>
+      </div>
+
+      {/* Right Side - Login Form */}
+      <div className='w-full lg:w-1/2 flex items-center justify-center p-8'>
+        <div className='w-full max-w-md space-y-8'>
+          {/* Mobile Logo - only shown on small screens */}
+          <div className='lg:hidden text-center mb-8'>
+            <img
+              src='/src/assets/logo.svg'
+              alt='Social Gym Logo'
+              className='w-50 object-contain dark:invert'
+            />
+            <p className='text-sm text-gray-600 dark:text-gray-400 mt-2'>
+              Conecte-se com outros atletas, compartilhe seus treinos e
+              conquiste seus objetivos. Inspire-se nos profissionais do esporte
+              e leve sua performance ao próximo nível.
+            </p>
+          </div>
+
+          {/* Login Header for desktop */}
+          <div className='hidden lg:block'>
+            <LoginHeader theme={theme} />
+          </div>
 
           {/* Form */}
           <form
@@ -72,11 +96,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ data }) => {
             </div>
 
             {/* Login Button */}
-            <Button
-              type='submit'
-              disabled={state.isLoading || !form.isValid}
-              className='w-full'
-            >
+            <Button type='submit' disabled={state.isLoading} className='w-full'>
               {state.isLoading ? (
                 <div className='flex items-center justify-center'>
                   <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2' />
@@ -91,9 +111,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ data }) => {
             </Button>
           </form>
 
-          <LoginFooter onSwitchToRegister={actions.onSwitchToRegister} />
           <SocialLogin />
-        </Card>
+          <LoginFooter onSwitchToRegister={actions.onSwitchToRegister} />
+        </div>
       </div>
     </div>
   );
