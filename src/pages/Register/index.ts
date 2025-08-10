@@ -31,15 +31,11 @@ export interface RegisterData {
     onSubmit: (data: RegisterFormData) => Promise<void>;
     togglePassword: () => void;
     toggleConfirmPassword: () => void;
-    onSwitchToLogin?: () => void;
+    onSwitchToLogin: () => void;
   };
 }
 
-interface RegisterProps {
-  onSwitchToLogin?: () => void;
-}
-
-export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
+export const Register: React.FC = () => {
   const { mode, toggleTheme } = useTheme();
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -48,6 +44,10 @@ export const Register: React.FC<RegisterProps> = ({ onSwitchToLogin }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const onSwitchToLogin = () => {
+    navigate('/');
+  };
 
   const {
     register,

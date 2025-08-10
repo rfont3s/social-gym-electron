@@ -100,9 +100,7 @@ export const RegisterView: React.FC<RegisterViewProps> = ({ data }) => {
             </Button>
           </form>
 
-          <RegisterFooter
-            onSwitchToLogin={actions.onSwitchToLogin || (() => {})}
-          />
+          <RegisterFooter onSwitchToLogin={actions.onSwitchToLogin} />
         </div>
       </div>
     </div>

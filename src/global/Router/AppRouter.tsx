@@ -1,5 +1,5 @@
 import { useAuth } from '@/global/hooks/useAuth';
-import { AuthComponent } from '@components';
+import { Login, Register } from '@pages';
 import { Dashboard } from '@pages';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
@@ -54,12 +54,22 @@ function PublicRoute({ children }: PublicRouteProps) {
 export function AppRouter() {
   return (
     <Routes>
-      {/* Rota de autenticação */}
+      {/* Rota de login */}
       <Route
         path='/'
         element={
           <PublicRoute>
-            <AuthComponent />
+            <Login />
+          </PublicRoute>
+        }
+      />
+
+      {/* Rota de cadastro */}
+      <Route
+        path='/register'
+        element={
+          <PublicRoute>
+            <Register />
           </PublicRoute>
         }
       />
@@ -74,11 +84,8 @@ export function AppRouter() {
         }
       />
 
-      {/* Rota raiz - redireciona baseado na autenticação */}
-      <Route path='/' element={<Navigate to='/dashboard' replace />} />
-
       {/* Rota para páginas não encontradas */}
-      <Route path='*' element={<Navigate to='/dashboard' replace />} />
+      <Route path='*' element={<Navigate to='/' replace />} />
     </Routes>
   );
 }

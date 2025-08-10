@@ -19,13 +19,12 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       {/* Email Field */}
       <FormInput
         {...form.register('email')}
-        label='Email'
         type='email'
-        placeholder='seu@email.com'
+        placeholder='Seu email'
         disabled={state.isLoading}
         error={form.errors.email}
         required
-        autoComplete="off"
+        autoComplete='off'
         icon={<Email fontSize='small' />}
       />
 
@@ -33,13 +32,12 @@ export const LoginFormFields: React.FC<LoginFormFieldsProps> = ({
       <div className='relative'>
         <FormInput
           {...form.register('password')}
-          label='Senha'
           type={state.showPassword ? 'text' : 'password'}
-          placeholder='••••••••'
+          placeholder='Sua senha'
           disabled={state.isLoading}
           error={form.errors.password}
           required
-          autoComplete="current-password"
+          autoComplete='current-password'
           icon={<Lock fontSize='small' />}
           endAdornment={
             <button

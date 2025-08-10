@@ -28,21 +28,21 @@ export interface LoginData {
   actions: {
     onSubmit: (data: LoginFormData) => Promise<void>;
     togglePassword: () => void;
-    onSwitchToRegister?: () => void;
+    onSwitchToRegister: () => void;
   };
 }
 
-interface LoginProps {
-  onSwitchToRegister?: () => void;
-}
-
-export const Login: React.FC<LoginProps> = ({ onSwitchToRegister }) => {
+export const Login: React.FC = () => {
   const { mode, toggleTheme } = useTheme();
   const { login } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const onSwitchToRegister = () => {
+    navigate('/register');
+  };
 
   const {
     register,
