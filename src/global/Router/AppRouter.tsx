@@ -1,6 +1,5 @@
 import { useAuth } from '@/global/hooks/useAuth';
-import { Login, Register } from '@pages';
-import { Dashboard } from '@pages';
+import { Dashboard, Feed, Login, Register } from '@pages';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 // Componente para rotas protegidas
@@ -44,11 +43,7 @@ function PublicRoute({ children }: PublicRouteProps) {
     );
   }
 
-  return isAuthenticated ? (
-    <Navigate to='/dashboard' replace />
-  ) : (
-    <>{children}</>
-  );
+  return isAuthenticated ? <Navigate to='/feed' replace /> : <>{children}</>;
 }
 
 export function AppRouter() {
@@ -71,6 +66,16 @@ export function AppRouter() {
           <PublicRoute>
             <Register />
           </PublicRoute>
+        }
+      />
+
+      {/* Rota do feed (protegida) */}
+      <Route
+        path='/feed'
+        element={
+          <ProtectedRoute>
+            <Feed />
+          </ProtectedRoute>
         }
       />
 

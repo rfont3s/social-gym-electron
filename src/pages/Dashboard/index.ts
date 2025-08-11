@@ -1,5 +1,3 @@
-import { useAuth } from '@/global/hooks/useAuth';
-import { useTheme } from '@/global/hooks/useTheme';
 import React from 'react';
 import { DashboardView } from './view';
 
@@ -10,24 +8,11 @@ export interface DashboardStats {
 }
 
 export interface DashboardData {
-  user: {
-    name: string;
-  } | null;
   stats: DashboardStats;
-  theme: {
-    mode: 'light' | 'dark';
-    toggleTheme: () => void;
-  };
-  actions: {
-    logout: () => void;
-  };
 }
 
 // Controller como React Component
 export const Dashboard: React.FC = () => {
-  const { mode, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
-
   // Simulando dados da API - em uma aplicação real, esses dados viriam do backend
   const stats: DashboardStats = {
     activeMembers: 1234,
@@ -36,15 +21,7 @@ export const Dashboard: React.FC = () => {
   };
 
   const data: DashboardData = {
-    user,
     stats,
-    theme: {
-      mode,
-      toggleTheme,
-    },
-    actions: {
-      logout,
-    },
   };
 
   // Usando createElement para criar a view e passar as props
