@@ -22,8 +22,8 @@ export const MobileBottomNavigation: React.FC = () => {
           />
         </svg>
       ),
-      path: '/feed',
-      active: location.pathname === '/feed',
+      path: '/',
+      active: location.pathname === '/' || location.pathname === '/feed',
     },
     {
       icon: () => (

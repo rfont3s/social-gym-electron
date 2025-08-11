@@ -60,8 +60,8 @@ export const Login: React.FC = () => {
     try {
       const { token, user } = await AuthController.login(data);
       login(token, user);
-      // Navegar para o dashboard após login bem-sucedido
-      navigate('/dashboard');
+      // Navegar para a página inicial (/) - o roteamento decidirá automaticamente
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao fazer login');
     } finally {

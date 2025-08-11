@@ -28,8 +28,8 @@ export const Sidebar: React.FC = () => {
         </svg>
       ),
       label: 'Página Inicial',
-      path: '/feed',
-      active: location.pathname === '/feed',
+      path: '/',
+      active: location.pathname === '/' || location.pathname === '/feed',
     },
     {
       icon: (
