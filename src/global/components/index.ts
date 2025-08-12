@@ -1,5 +1,4 @@
 export { AppRouter } from '../Router';
-export { AuthComponent } from './AuthComponent';
 export { AuthHeader } from './AuthHeader';
 export { Background } from './Background';
 export { Button } from './Button';
