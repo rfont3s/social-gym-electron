@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { SuggestionsSidebar } from './SuggestionsSidebar';
-import { SuggestionsSkeleton } from './skeletons';
+import React, { useEffect, useState } from 'react';
+import { SuggestionsSidebar } from '../SuggestionsSidebar/SuggestionsSidebar';
+import { SuggestionsSkeleton } from '../skeletons';
 
 export const SuggestionsSidebarWithLoading: React.FC = () => {
   const [loading, setLoading] = useState(true);

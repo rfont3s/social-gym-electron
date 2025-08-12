@@ -1,7 +1,7 @@
-import React from 'react';
 import { FormInput } from '@components/FormInput';
 import { Email, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
-import type { LoginData } from '../index';
+import React from 'react';
+import type { LoginData } from '../../index';
 
 interface LoginFormFieldsProps {
   form: LoginData['form'];

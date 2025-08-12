@@ -1,6 +1,6 @@
+import logo from '@assets/logo.svg';
 import { DarkMode, LightMode } from '@mui/icons-material';
 import React from 'react';
-import logo from '../../../assets/logo.svg';
 
 interface RegisterHeaderProps {
   theme: {

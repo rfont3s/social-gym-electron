@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Stories } from './Stories';
-import { StoriesSkeleton } from './skeletons';
+import React, { useEffect, useState } from 'react';
+import { Stories } from '../Stories/Stories';
+import { StoriesSkeleton } from '../skeletons';
 
 export const StoriesWithLoading: React.FC = () => {
   const [loading, setLoading] = useState(true);

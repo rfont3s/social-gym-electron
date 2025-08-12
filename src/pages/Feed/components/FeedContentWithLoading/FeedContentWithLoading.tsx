@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { StoriesWithLoading } from './StoriesWithLoading';
-import { Post } from './Post';
-import { PostSkeleton } from './skeletons';
+import React, { useEffect, useState } from 'react';
+import { Post } from '../Post/Post';
+import { PostSkeleton } from '../skeletons';
+import { StoriesWithLoading } from '../StoriesWithLoading/StoriesWithLoading';
 
 interface PostData {
   id: string;
@@ -25,7 +25,7 @@ interface PostData {
   timestamp: string;
 }
 
-export const FeedContent: React.FC = () => {
+export const FeedContentWithLoading: React.FC = () => {
   const [posts, setPosts] = useState<PostData[]>([]);
   const [loading, setLoading] = useState(true);
 

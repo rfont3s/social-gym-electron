@@ -1,4 +1,4 @@
-export { LoginHeader } from './LoginHeader';
+export { LoginFooter } from './LoginFooter/LoginFooter';
 export { LoginFormFields } from './LoginFormFields';
-export { SocialLogin } from './SocialLogin';
-export { LoginFooter } from './LoginFooter';
+export { LoginHeader } from './LoginHeader';
+export { SocialLogin } from './SocialLogin/SocialLogin';

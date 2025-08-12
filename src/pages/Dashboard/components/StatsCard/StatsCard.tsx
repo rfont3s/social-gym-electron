@@ -25,7 +25,9 @@ export const StatsCard: React.FC<StatsCardProps> = ({
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
         </div>
-        <div className={`w-12 h-12 ${bgColorClass} rounded-lg flex items-center justify-center`}>
+        <div
+          className={`w-12 h-12 ${bgColorClass} rounded-lg flex items-center justify-center`}
+        >
           {icon}
         </div>
       </div>

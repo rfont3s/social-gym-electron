@@ -1,8 +1,8 @@
 import React from 'react';
-import { Post } from './Post';
-import { Stories } from './Stories';
+import { Post } from '../Post/Post';
+import { Stories } from '../Stories/Stories';
 
-export const MainFeed: React.FC = () => {
+export const FeedContent: React.FC = () => {
   const mockPosts = [
     {
       id: '1',
@@ -81,24 +81,22 @@ export const MainFeed: React.FC = () => {
   ];
 
   return (
-    <div className='px-4 py-6 md:ml-64'>
-      <div className='w-full'>
-        {/* Stories */}
-        <Stories />
+    <div className='w-full md:max-w-md lg:max-w-lg md:mx-auto py-6'>
+      {/* Stories */}
+      <Stories />
 
-        {/* Posts */}
-        <div className='space-y-6'>
-          {mockPosts.map(post => (
-            <Post key={post.id} post={post} />
-          ))}
-        </div>
+      {/* Posts */}
+      <div className='space-y-6 md:px-4'>
+        {mockPosts.map(post => (
+          <Post key={post.id} post={post} />
+        ))}
+      </div>
 
-        {/* Load More */}
-        <div className='text-center py-8'>
-          <button className='px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200'>
-            Carregar mais posts
-          </button>
-        </div>
+      {/* Load More */}
+      <div className='text-center py-8 px-4'>
+        <button className='px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors duration-200'>
+          Carregar mais posts
+        </button>
       </div>
     </div>
   );

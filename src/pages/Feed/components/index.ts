@@ -1,10 +1,10 @@
-export { FeedContent } from './FeedContent';
-export { FeedContent as FeedContentWithLoading } from './FeedContentWithLoading';
-export { Post } from './Post';
-export { Stories } from './Stories';
-export { StoriesWithLoading } from './StoriesWithLoading';
-export { SuggestionsSidebar } from './SuggestionsSidebar';
-export { SuggestionsSidebarWithLoading } from './SuggestionsSidebarWithLoading';
+export { FeedContent } from './FeedContent/FeedContent';
+export { FeedContentWithLoading as FeedContentWithLoading } from './FeedContentWithLoading/FeedContentWithLoading';
+export { Post } from './Post/Post';
+export { Stories } from './Stories/Stories';
+export { StoriesWithLoading } from './StoriesWithLoading/StoriesWithLoading';
+export { SuggestionsSidebar } from './SuggestionsSidebar/SuggestionsSidebar';
+export { SuggestionsSidebarWithLoading } from './SuggestionsSidebarWithLoading/SuggestionsSidebarWithLoading';
 
 // Skeletons
 export * from './skeletons';
