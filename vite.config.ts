@@ -47,11 +47,25 @@ export default defineConfig({
       '@controllers/*': path.resolve(__dirname, './src/controllers/*'),
       '@views': path.resolve(__dirname, './src/views'),
       '@views/*': path.resolve(__dirname, './src/views/*'),
+      '@test': path.resolve(__dirname, './src/test'),
+      '@test/*': path.resolve(__dirname, './src/test/*'),
       '@': path.resolve(__dirname, './src'),
     },
   },
   test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
     projects: [
+      {
+        name: 'unit',
+        test: {
+          globals: true,
+          environment: 'jsdom',
+          setupFiles: ['./src/test/setup.ts'],
+          include: ['src/**/*.{test,spec}.{js,ts,jsx,tsx}'],
+        },
+      },
       {
         extends: true,
         plugins: [

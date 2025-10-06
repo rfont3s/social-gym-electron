@@ -1,9 +1,9 @@
-import { useAuth } from '@/global/hooks/useAuth';
-import { useTheme } from '@/global/hooks/useTheme';
-import { AuthController } from '@controllers/AuthController';
+import { useAuth } from '../../global/hooks/useAuth';
+import { useTheme } from '../../global/hooks/useTheme';
+import { AuthController } from '../../controllers/AuthController';
 import { yupResolver } from '@hookform/resolvers/yup';
-import type { LoginFormData } from '@schemas/validationSchemas';
-import { loginSchema } from '@schemas/validationSchemas';
+import type { LoginFormData } from '../../schemas/validationSchemas';
+import { loginSchema } from '../../schemas/validationSchemas';
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
