@@ -77,7 +77,7 @@ export function MessageInput({
   };
 
   return (
-    <div className={`border-t border-gray-200 bg-white p-4 ${className}`}>
+    <div className={`border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 ${className}`}>
       <div className="flex gap-2 items-end">
         <textarea
           ref={textareaRef}
@@ -87,9 +87,11 @@ export function MessageInput({
           disabled={disabled}
           placeholder="Digite sua mensagem..."
           className="
-            flex-1 resize-none rounded-lg border border-gray-300 px-4 py-2
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            disabled:bg-gray-100 disabled:cursor-not-allowed
+            flex-1 resize-none rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2
+            bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100
+            placeholder:text-gray-400 dark:placeholder:text-gray-500
+            focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent
+            disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed
             max-h-32 min-h-[40px]
           "
           rows={1}
@@ -99,9 +101,9 @@ export function MessageInput({
           disabled={!message.trim() || disabled}
           className="
             px-6 py-2 rounded-lg font-medium
-            bg-blue-500 text-white
-            hover:bg-blue-600
-            disabled:bg-gray-300 disabled:cursor-not-allowed
+            bg-blue-500 dark:bg-blue-600 text-white
+            hover:bg-blue-600 dark:hover:bg-blue-500
+            disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed
             transition-colors
             flex-shrink-0
           "

@@ -66,12 +66,12 @@ export function MessageList({
   if (messages.length === 0) {
     return (
       <div
-        className={`flex items-center justify-center h-full text-gray-500 ${className}`}
+        className={`flex items-center justify-center h-full text-gray-500 dark:text-gray-400 ${className}`}
       >
         <div className='text-center p-4'>
           <div className='text-4xl mb-2'>💭</div>
           <p>Ainda não há mensagens</p>
-          <p className='text-sm text-gray-400 mt-1'>
+          <p className='text-sm text-gray-400 dark:text-gray-500 mt-1'>
             Envie uma mensagem para começar a conversa
           </p>
         </div>
@@ -98,7 +98,7 @@ export function MessageList({
             <div key={message.id}>
               {showDateSeparator && (
                 <div className='flex justify-center my-4'>
-                  <span className='px-4 py-1 text-xs text-gray-500 bg-gray-200 rounded-full'>
+                  <span className='px-4 py-1 text-xs text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 rounded-full'>
                     {formatDate(message.createdAt)}
                   </span>
                 </div>
@@ -114,7 +114,7 @@ export function MessageList({
                 >
                   {/* Avatar */}
                   {showAvatar && !isOwnMessage && (
-                    <div className='w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0 text-sm'>
+                    <div className='w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 text-gray-700 dark:text-gray-200 flex items-center justify-center flex-shrink-0 text-sm'>
                       {message.sender.firstName.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -123,7 +123,7 @@ export function MessageList({
                   {/* Message bubble */}
                   <div className='flex flex-col'>
                     {showAvatar && !isOwnMessage && (
-                      <span className='text-xs text-gray-600 mb-1 px-2'>
+                      <span className='text-xs text-gray-600 dark:text-gray-400 mb-1 px-2'>
                         {message.sender.firstName} {message.sender.lastName}
                       </span>
                     )}
@@ -132,8 +132,8 @@ export function MessageList({
                       px-3 py-2 rounded-2xl break-words relative
                       ${
                         isOwnMessage
-                          ? 'bg-blue-500 text-white rounded-br-sm'
-                          : 'bg-gray-200 text-gray-900 rounded-bl-sm'
+                          ? 'bg-blue-500 dark:bg-blue-600 text-white rounded-br-sm'
+                          : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm'
                       }
                     `}
                     >
@@ -143,8 +143,8 @@ export function MessageList({
                           mb-2 p-2 rounded border-l-2
                           ${
                             isOwnMessage
-                              ? 'bg-blue-600 border-blue-300'
-                              : 'bg-gray-300 border-gray-500'
+                              ? 'bg-blue-600 dark:bg-blue-700 border-blue-300 dark:border-blue-400'
+                              : 'bg-gray-300 dark:bg-gray-600 border-gray-500 dark:border-gray-400'
                           }
                         `}
                         >
@@ -170,13 +170,13 @@ export function MessageList({
                       <div className='flex items-center gap-1 absolute bottom-1 right-2'>
                         {message.isEdited && !message.isDeleted && (
                           <span
-                            className={`text-[10px] italic ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'}`}
+                            className={`text-[10px] italic ${isOwnMessage ? 'text-blue-100 dark:text-blue-200' : 'text-gray-500 dark:text-gray-400'}`}
                           >
                             editada
                           </span>
                         )}
                         <span
-                          className={`text-[10px] ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'}`}
+                          className={`text-[10px] ${isOwnMessage ? 'text-blue-100 dark:text-blue-200' : 'text-gray-500 dark:text-gray-400'}`}
                         >
                           {formatTime(message.createdAt)}
                         </span>
@@ -185,7 +185,7 @@ export function MessageList({
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
-                      <div className='flex gap-0.5 mt-0.5 px-2 flex-wrap'>
+                      <div className='flex gap-0.5 -mt-1 flex-wrap relative z-10'>
                         {/* Group reactions by emoji */}
                         {Object.entries(
                           message.reactions.reduce((acc, reaction) => {
@@ -206,15 +206,11 @@ export function MessageList({
                                   onAddReaction?.(message.id, emoji);
                                 }
                               }}
-                              className={`text-[10px] rounded-full px-1.5 py-0.5 flex items-center gap-0.5 transition-colors ${
-                                userReacted
-                                  ? 'bg-blue-100 border border-blue-300'
-                                  : 'bg-white border border-gray-300 hover:bg-gray-100'
-                              }`}
+                              className='rounded-full px-0.5 py-0 flex items-center gap-0.5 transition-colors bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                             >
                               <span className='text-xs'>{emoji}</span>
                               {reactions.length > 1 && (
-                                <span className='text-[9px] text-gray-600'>
+                                <span className='text-[9px] text-gray-600 dark:text-gray-400'>
                                   {reactions.length}
                                 </span>
                               )}
@@ -231,7 +227,7 @@ export function MessageList({
                   <div className={`absolute -top-3 ${isOwnMessage ? 'right-2' : 'left-2'} flex gap-1 opacity-0 group-hover:opacity-100 z-10`}>
                     <button
                       onClick={() => setShowReactionPicker(showReactionPicker === message.id ? null : message.id)}
-                      className='p-1 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors w-7 h-7 flex items-center justify-center'
+                      className='p-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors w-7 h-7 flex items-center justify-center'
                       title='Adicionar reação'
                     >
                       <span className='text-base leading-none'>😊</span>
@@ -244,10 +240,10 @@ export function MessageList({
                             onDeleteMessage(message.id);
                           }
                         }}
-                        className='p-1 bg-white border border-gray-300 rounded-full shadow-md hover:bg-red-50 hover:border-red-300 transition-colors w-7 h-7 flex items-center justify-center'
+                        className='p-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-full shadow-md hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-300 dark:hover:border-red-500 transition-colors w-7 h-7 flex items-center justify-center'
                         title='Excluir mensagem (até 2 minutos após o envio)'
                       >
-                        <svg className='w-4 h-4 text-gray-600 hover:text-red-600' fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className='w-4 h-4 text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400' fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                       </button>
@@ -263,7 +259,7 @@ export function MessageList({
                       className='fixed inset-0 z-30'
                       onClick={() => setShowReactionPicker(null)}
                     />
-                    <div className={`absolute z-40 -top-12 ${isOwnMessage ? 'right-2' : 'left-2'} bg-white border border-gray-300 rounded-lg shadow-xl p-2 flex gap-1`}>
+                    <div className={`absolute z-40 -top-12 ${isOwnMessage ? 'right-2' : 'left-2'} bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-xl p-2 flex gap-1`}>
                       {availableReactions.map(emoji => (
                         <button
                           key={emoji}
@@ -271,7 +267,7 @@ export function MessageList({
                             onAddReaction?.(message.id, emoji);
                             setShowReactionPicker(null);
                           }}
-                          className='text-xl hover:bg-gray-100 rounded p-1.5 transition-colors'
+                          className='text-xl hover:bg-gray-100 dark:hover:bg-gray-700 rounded p-1.5 transition-colors'
                         >
                           {emoji}
                         </button>

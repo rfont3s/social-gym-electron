@@ -280,6 +280,22 @@ export class ChatApiService {
     }
   }
 
+  async muteConversation(conversationId: string, duration: 'day' | 'week' | 'forever' | null, currentUserId?: number): Promise<ApiResponse<void>> {
+    console.log('[ChatApiService] POST /chat/conversations/' + conversationId + '/mute', 'duration:', duration, 'userId:', currentUserId);
+    try {
+      const response: AxiosResponse<ApiResponse<void>> = await this.api.post(
+        `/chat/conversations/${conversationId}/mute`,
+        { duration },
+        { params: { userId: currentUserId } }
+      );
+      console.log('[ChatApiService] Mute conversation response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[ChatApiService] Error response:', error.response?.data);
+      throw error;
+    }
+  }
+
   // Utility method to get file URL
   getFileUrl(fileName: string): string {
     return `${this.api.defaults.baseURL}/files/${fileName}`;

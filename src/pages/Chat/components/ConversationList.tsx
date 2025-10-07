@@ -1,3 +1,4 @@
+import { BellOff } from 'lucide-react';
 import type { Conversation, User } from '../../../types/chat';
 import { ConversationType } from '../../../types/chat';
 
@@ -91,12 +92,12 @@ export function ConversationList({
   if (conversations.length === 0) {
     return (
       <div
-        className={`flex items-center justify-center h-full text-gray-500 ${className}`}
+        className={`flex items-center justify-center h-full text-gray-500 dark:text-gray-400 ${className}`}
       >
         <div className='text-center p-4'>
           <div className='text-4xl mb-2'>💬</div>
           <p>Nenhuma conversa ainda</p>
-          <p className='text-sm text-gray-400 mt-1'>
+          <p className='text-sm text-gray-400 dark:text-gray-500 mt-1'>
             Inicie uma nova conversa para começar
           </p>
         </div>
@@ -163,13 +164,21 @@ export function ConversationList({
           const isOnline = otherUser?.isOnline || false;
           const userStatus = otherUser?.status;
 
+          // Check if conversation is muted for current user
+          const currentParticipant = conversation.participants?.find(
+            p => p.userId === currentUser?.id
+          );
+          const isMuted =
+            currentParticipant?.mutedUntil &&
+            new Date(currentParticipant.mutedUntil) > new Date();
+
           return (
             <div
               key={conversation.id}
               onClick={() => onConversationSelect(conversation)}
               className={`
-                py-1.5 px-2.5 border-b border-gray-200 cursor-pointer transition-colors
-                ${isActive ? 'bg-blue-50' : 'hover:bg-gray-50'}
+                py-1.5 px-2.5 border-b border-gray-200 dark:border-gray-700 cursor-pointer transition-colors
+                ${isActive ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-700'}
               `}
             >
               <div className='flex items-center gap-1.5'>
@@ -212,17 +221,22 @@ export function ConversationList({
                 )}
                 <div className='flex-1 min-w-0'>
                   <div className='flex justify-between items-center mb-0'>
-                    <h3 className='font-semibold text-xs text-gray-900 truncate'>
-                      {getConversationName(conversation)}
-                    </h3>
+                    <div className='flex items-center gap-1 flex-1 min-w-0'>
+                      <h3 className='font-semibold text-xs text-gray-900 dark:text-gray-100 truncate'>
+                        {getConversationName(conversation)}
+                      </h3>
+                      {isMuted && (
+                        <BellOff size={12} className='text-gray-500 dark:text-gray-400 flex-shrink-0' />
+                      )}
+                    </div>
                     {lastMessage && (
-                      <span className='text-[10px] text-gray-500 ml-2 flex-shrink-0'>
+                      <span className='text-[10px] text-gray-500 dark:text-gray-400 ml-2 flex-shrink-0'>
                         {formatTime(lastMessage.createdAt)}
                       </span>
                     )}
                   </div>
                   {conversation.unreadCount > 0 ? (
-                    <p className='text-[10px] text-gray-900 font-semibold truncate'>
+                    <p className='text-[10px] text-gray-900 dark:text-gray-100 font-semibold truncate'>
                       {conversation.unreadCount}{' '}
                       {conversation.unreadCount === 1
                         ? 'nova mensagem'
@@ -230,7 +244,7 @@ export function ConversationList({
                     </p>
                   ) : conversation.type === ConversationType.GROUP &&
                     lastMessage ? (
-                    <p className='text-[10px] text-gray-500 truncate'>
+                    <p className='text-[10px] text-gray-500 dark:text-gray-400 truncate'>
                       {lastMessage.sender.firstName}:{' '}
                       {lastMessage.isDeleted
                         ? 'Mensagem excluída'
@@ -238,7 +252,7 @@ export function ConversationList({
                     </p>
                   ) : (
                     otherUser && (
-                      <p className='text-[10px] text-gray-500 truncate'>
+                      <p className='text-[10px] text-gray-500 dark:text-gray-400 truncate'>
                         {getStatusText(
                           userStatus,
                           isOnline,

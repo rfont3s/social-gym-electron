@@ -36,12 +36,12 @@ export function StatusSelector({ currentStatus, onStatusChange }: StatusSelector
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
       >
         <div className={`w-2.5 h-2.5 rounded-full ${currentStatusInfo.color}`}></div>
-        <span className="text-sm text-gray-700">{currentStatusInfo.label}</span>
+        <span className="text-sm text-gray-700 dark:text-gray-300">{currentStatusInfo.label}</span>
         <svg
-          className={`w-4 h-4 text-gray-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export function StatusSelector({ currentStatus, onStatusChange }: StatusSelector
       </button>
 
       {isOpen && (
-        <div className="absolute top-full mt-1 right-0 bg-white border border-gray-200 rounded-lg shadow-lg py-1 min-w-[140px] z-50">
+        <div className="absolute top-full mt-1 right-0 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg py-1 min-w-[140px] z-50">
           {statuses.map((status) => (
             <button
               key={status.value}
@@ -59,10 +59,10 @@ export function StatusSelector({ currentStatus, onStatusChange }: StatusSelector
                 onStatusChange(status.value);
                 setIsOpen(false);
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 transition-colors"
+              className="w-full flex items-center gap-2 px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
             >
               <div className={`w-2.5 h-2.5 rounded-full ${status.color}`}></div>
-              <span className="text-sm text-gray-700">{status.label}</span>
+              <span className="text-sm text-gray-700 dark:text-gray-200">{status.label}</span>
             </button>
           ))}
         </div>

@@ -1005,6 +1005,102 @@ export function ChatProvider({
     [apiService, user?.id]
   );
 
+  const muteConversation = useCallback(
+    async (conversationId: string, duration: 'day' | 'week' | 'forever' | null) => {
+      try {
+        console.log('[ChatContext] ===== MUTE CONVERSATION START =====');
+        console.log('[ChatContext] conversationId:', conversationId);
+        console.log('[ChatContext] duration:', duration);
+        console.log('[ChatContext] user?.id:', user?.id);
+
+        await apiService.muteConversation(conversationId, duration, user?.id);
+        console.log('[ChatContext] API call successful');
+
+        // Calculate mutedUntil date
+        let mutedUntil: Date | undefined = undefined;
+        if (duration === 'day') {
+          mutedUntil = new Date();
+          mutedUntil.setDate(mutedUntil.getDate() + 1);
+        } else if (duration === 'week') {
+          mutedUntil = new Date();
+          mutedUntil.setDate(mutedUntil.getDate() + 7);
+        } else if (duration === 'forever') {
+          mutedUntil = new Date();
+          mutedUntil.setFullYear(mutedUntil.getFullYear() + 100);
+        }
+        // Se duration for null, mutedUntil permanece undefined para dessilenciar
+
+        console.log('[ChatContext] Calculated mutedUntil:', mutedUntil);
+
+        // Update state immediately
+        setState(prev => {
+          console.log('[ChatContext] Updating state with mutedUntil:', mutedUntil);
+          console.log('[ChatContext] Current user ID:', user?.id, 'typeof:', typeof user?.id);
+
+          // Ensure userId comparison works with both number and string
+          const currentUserId = Number(user?.id);
+
+          const conversations = prev.conversations.map(conv => {
+            if (conv.id === conversationId) {
+              const updatedParticipants = conv.participants.map(p => {
+                console.log('[ChatContext] Checking participant:', p.userId, 'typeof:', typeof p.userId, 'vs currentUserId:', currentUserId);
+                if (p.userId === currentUserId) {
+                  console.log('[ChatContext] Updating participant mutedUntil from', p.mutedUntil, 'to', mutedUntil);
+                  // Create completely new object to ensure React detects change
+                  return {
+                    ...p,
+                    mutedUntil,
+                    // Force new object reference
+                    user: { ...p.user }
+                  };
+                }
+                return { ...p };
+              });
+              const updatedConv = {
+                ...conv,
+                participants: updatedParticipants,
+              };
+              console.log('[ChatContext] Updated conversation:', updatedConv);
+              console.log('[ChatContext] Updated participants:', updatedParticipants);
+              return updatedConv;
+            }
+            return conv;
+          });
+
+          let activeConversation = prev.activeConversation;
+          if (prev.activeConversation?.id === conversationId) {
+            const updatedActiveParticipants = prev.activeConversation.participants.map(p => {
+              if (p.userId === currentUserId) {
+                console.log('[ChatContext] Updating activeConversation participant mutedUntil');
+                // Create completely new object
+                return {
+                  ...p,
+                  mutedUntil,
+                  user: { ...p.user }
+                };
+              }
+              return { ...p };
+            });
+            activeConversation = {
+              ...prev.activeConversation,
+              participants: updatedActiveParticipants,
+            };
+          }
+
+          console.log('[ChatContext] New activeConversation:', activeConversation);
+          console.log('[ChatContext] New activeConversation participants:', activeConversation?.participants);
+          console.log('[ChatContext] ===== MUTE CONVERSATION END =====');
+
+          return { ...prev, conversations, activeConversation };
+        });
+      } catch (error) {
+        console.error('[ChatContext] Failed to mute conversation', error);
+        throw error;
+      }
+    },
+    [apiService, user?.id]
+  );
+
   const setActiveConversation = useCallback(
     async (conversation?: Conversation) => {
       // Reset unreadCount to 0 for the conversation being opened
@@ -1083,6 +1179,7 @@ export function ChatProvider({
     deleteMessage,
     addGroupMember,
     removeGroupMember,
+    muteConversation,
     setActiveConversation,
     uploadFile,
     connect,

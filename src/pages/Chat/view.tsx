@@ -34,6 +34,7 @@ export function ChatPage() {
     deleteMessage,
     addGroupMember,
     removeGroupMember,
+    muteConversation,
   } = useChatContext();
 
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] =
@@ -175,18 +176,18 @@ export function ChatPage() {
   // Se o status é OFFLINE, mostrar tela de reconexão
   if (currentUser?.status === 'OFFLINE') {
     return (
-      <div className='flex h-screen bg-gray-50 items-center justify-center'>
-        <div className='text-center p-8 bg-white rounded-lg shadow-lg max-w-md'>
+      <div className='flex h-screen bg-gray-50 dark:bg-gray-900 items-center justify-center'>
+        <div className='text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-md'>
           <div className='text-6xl mb-4'>💬</div>
-          <h2 className='text-2xl font-semibold text-gray-900 mb-2'>
+          <h2 className='text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2'>
             Você está offline
           </h2>
-          <p className='text-gray-600 mb-6'>
+          <p className='text-gray-600 dark:text-gray-400 mb-6'>
             Reconecte-se para continuar conversando
           </p>
           <button
             onClick={handleReconnect}
-            className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium'
+            className='px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors font-medium'
           >
             Reconectar
           </button>
@@ -196,24 +197,24 @@ export function ChatPage() {
   }
 
   return (
-    <div className='flex h-screen bg-gray-50'>
+    <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
       {/* Conversation List Sidebar */}
-      <div className='w-80 bg-white border-r border-gray-200'>
+      <div className='w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700'>
         <div className='h-full flex flex-col'>
           {/* Header */}
-          <div className='p-4 border-b border-gray-200'>
+          <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
             <div className='flex items-center justify-between mb-2'>
-              <h2 className='text-lg font-semibold text-gray-900'>Mensagens</h2>
+              <h2 className='text-lg font-semibold text-gray-900 dark:text-gray-100'>Mensagens</h2>
               <button
                 onClick={() => setIsNewConversationModalOpen(true)}
-                className='p-2 rounded-full hover:bg-gray-100 transition-colors text-blue-600'
+                className='p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-300'
                 title='Nova conversa'
               >
                 <Plus size={20} />
               </button>
             </div>
             <div className='flex items-center justify-between'>
-              <span className='text-base font-medium text-gray-700'>
+              <span className='text-base font-medium text-gray-700 dark:text-gray-300'>
                 {currentUser
                   ? `${currentUser.firstName} ${currentUser.lastName}`.trim() ||
                     currentUser.email
@@ -228,8 +229,8 @@ export function ChatPage() {
 
           {/* Error message */}
           {error && (
-            <div className='p-4 bg-red-50 border-b border-red-200'>
-              <p className='text-sm text-red-600'>{error}</p>
+            <div className='p-4 bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800'>
+              <p className='text-sm text-red-600 dark:text-red-400'>{error}</p>
             </div>
           )}
 
@@ -237,8 +238,8 @@ export function ChatPage() {
           {isLoading && conversations.length === 0 ? (
             <div className='flex-1 flex items-center justify-center'>
               <div className='text-center'>
-                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto' />
-                <p className='text-sm text-gray-500 mt-2'>
+                <div className='animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 dark:border-blue-400 mx-auto' />
+                <p className='text-sm text-gray-500 dark:text-gray-400 mt-2'>
                   Carregando conversas...
                 </p>
               </div>
@@ -264,6 +265,7 @@ export function ChatPage() {
               conversation={activeConversation}
               currentUser={currentUser}
               onManageMembers={() => setIsGroupMembersModalOpen(true)}
+              onMuteConversation={(duration) => muteConversation(activeConversation.id, duration)}
             />
 
             {/* Messages */}
@@ -286,13 +288,13 @@ export function ChatPage() {
           </>
         ) : (
           /* Empty State */
-          <div className='flex-1 flex items-center justify-center text-gray-500'>
+          <div className='flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400'>
             <div className='text-center'>
               <div className='text-6xl mb-4'>💬</div>
-              <h3 className='text-xl font-medium mb-2'>
+              <h3 className='text-xl font-medium mb-2 text-gray-900 dark:text-gray-100'>
                 Selecione uma conversa
               </h3>
-              <p className='text-gray-400'>
+              <p className='text-gray-400 dark:text-gray-500'>
                 Escolha uma conversa para começar a trocar mensagens
               </p>
             </div>

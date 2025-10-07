@@ -31,6 +31,7 @@ export interface ConversationParticipant {
   role: ParticipantRole;
   joinedAt: Date;
   leftAt?: Date;
+  mutedUntil?: Date;
 }
 
 export interface Message {
@@ -228,6 +229,7 @@ export interface ChatContextValue extends ChatState {
   deleteMessage: (messageId: string) => Promise<void>;
   addGroupMember: (conversationId: string, memberUserId: number) => Promise<void>;
   removeGroupMember: (conversationId: string, memberUserId: number) => Promise<void>;
+  muteConversation: (conversationId: string, duration: 'day' | 'week' | 'forever' | null) => Promise<void>;
   setActiveConversation: (conversation?: Conversation) => Promise<void>;
   uploadFile: (file: File, conversationId: string) => Promise<void>;
 
