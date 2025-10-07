@@ -163,9 +163,24 @@ export function ChatProvider({
   // Setup socket event listeners
   useEffect(() => {
     // Connection events
-    socketService.on('connect', () => {
+    socketService.on('connect', async () => {
       console.log('[ChatContext] Socket connected!');
       setState(prev => ({ ...prev, isConnected: true, error: undefined }));
+
+      // Após conectar, enviar o status atual do usuário para garantir sincronização
+      // Isso garante que após reload, o status seja preservado
+      try {
+        const currentUserId = user?.id ? Number(user.id) : undefined;
+        if (currentUserId) {
+          const userResponse = await apiService.getUserById(currentUserId);
+          if (userResponse.data && userResponse.data.status) {
+            console.log('[ChatContext] Sending current status after connection:', userResponse.data.status);
+            await apiService.updateUserStatus(userResponse.data.status, currentUserId);
+          }
+        }
+      } catch (error) {
+        console.error('[ChatContext] Error sending status after connection:', error);
+      }
     });
 
     socketService.on('disconnect', () => {
@@ -197,7 +212,7 @@ export function ChatProvider({
         const conversations = prev.conversations.map(conv => {
           if (conv.id === message.conversationId) {
             // Check if message already exists to avoid duplicates
-            const messageExists = conv.messages.some(m => m.id === message.id);
+            const messageExists = conv.messages?.some(m => m.id === message.id);
             if (messageExists) {
               console.log(
                 '[ChatContext] Message already exists, skipping:',
@@ -243,7 +258,7 @@ export function ChatProvider({
 
             return {
               ...conv,
-              messages: [...conv.messages, message],
+              messages: [...(conv.messages || []), message],
               lastMessage: message,
               unreadCount: newUnreadCount,
             };
@@ -384,7 +399,8 @@ export function ChatProvider({
               ...p,
               user: {
                 ...p.user,
-                isOnline: onlineUserIds.includes(p.userId),
+                // Não marcar como online se o status for INVISIBLE
+                isOnline: onlineUserIds.includes(p.userId) && p.user.status !== 'INVISIBLE',
               },
             }));
             return { ...conv, participants };
@@ -396,7 +412,8 @@ export function ChatProvider({
               ...p,
               user: {
                 ...p.user,
-                isOnline: onlineUserIds.includes(p.userId),
+                // Não marcar como online se o status for INVISIBLE
+                isOnline: onlineUserIds.includes(p.userId) && p.user.status !== 'INVISIBLE',
               },
             }));
             activeConversation = { ...activeConversation, participants };
@@ -414,7 +431,44 @@ export function ChatProvider({
       'user_online_status',
       (data: { userId: number; isOnline: boolean }) => {
         console.log('[ChatContext] User online status event:', data);
-        updateOnlineStatus();
+
+        // Atualizar imediatamente no estado, sem esperar buscar do backend
+        setState(prev => {
+          const conversations = prev.conversations.map(conv => {
+            const participants = conv.participants?.map(p => {
+              if (p.userId === data.userId) {
+                return {
+                  ...p,
+                  user: {
+                    ...p.user,
+                    isOnline: data.isOnline,
+                  },
+                };
+              }
+              return p;
+            });
+            return { ...conv, participants };
+          });
+
+          let activeConversation = prev.activeConversation;
+          if (activeConversation) {
+            const participants = activeConversation.participants?.map(p => {
+              if (p.userId === data.userId) {
+                return {
+                  ...p,
+                  user: {
+                    ...p.user,
+                    isOnline: data.isOnline,
+                  },
+                };
+              }
+              return p;
+            });
+            activeConversation = { ...activeConversation, participants };
+          }
+
+          return { ...prev, conversations, activeConversation };
+        });
       }
     );
 
@@ -587,6 +641,36 @@ export function ChatProvider({
       }
     });
 
+    // Message deleted event
+    socketService.on('message_deleted', (data: { messageId: string; conversationId: string }) => {
+      console.log('[ChatContext] Message deleted:', data);
+
+      setState(prev => {
+        const activeConv = prev.activeConversation;
+        if (!activeConv || activeConv.id !== data.conversationId) return prev;
+
+        const messages = activeConv.messages?.map(msg => {
+          if (msg.id === data.messageId) {
+            return {
+              ...msg,
+              isDeleted: true,
+              content: 'Mensagem excluída',
+              reactions: [], // Limpar reações
+            };
+          }
+          return msg;
+        });
+
+        return {
+          ...prev,
+          activeConversation: {
+            ...activeConv,
+            messages,
+          },
+        };
+      });
+    });
+
     // Atualizar status online periodicamente (a cada 5 segundos)
     const interval = setInterval(updateOnlineStatus, 5000);
 
@@ -605,6 +689,7 @@ export function ChatProvider({
       socketService.off('user_online_status');
       socketService.off('reaction_added');
       socketService.off('reaction_removed');
+      socketService.off('message_deleted');
     };
   }, [socketService, apiService, markAsRead, user]);
 
@@ -653,6 +738,15 @@ export function ChatProvider({
       const response = await apiService.getConversations({
         userId: Number(user.id),
       });
+
+      // Log para debugar mensagens deletadas
+      console.log('[ChatContext] loadConversations - Received', response.data.length, 'conversations');
+      response.data.forEach(conv => {
+        const deletedCount = conv.messages?.filter((m: any) => m.isDeleted).length || 0;
+        const totalMessages = conv.messages?.length || 0;
+        console.log(`[ChatContext] Conversation ${conv.id} has ${deletedCount} deleted messages out of ${totalMessages} total`);
+      });
+
       // Initialize conversations with empty messages array - messages will be loaded separately
       const conversations = response.data.map(conv => ({
         ...conv,
@@ -690,6 +784,16 @@ export function ChatProvider({
           response.data.length,
           'messages'
         );
+
+        // Log para debugar mensagens deletadas
+        const deletedCount = response.data.filter((m: any) => m.isDeleted).length;
+        console.log(`[ChatContext] loadMessages - Conversation ${conversationId} has ${deletedCount} deleted messages out of ${response.data.length} total`);
+        response.data.forEach((msg: any) => {
+          if (msg.isDeleted) {
+            console.log(`[ChatContext] Deleted message found: ${msg.id}, content: "${msg.content}", isDeleted: ${msg.isDeleted}`);
+          }
+        });
+
         setState(prev => {
           const conversations = prev.conversations.map(conv => {
             if (conv.id === conversationId) {
@@ -859,6 +963,20 @@ export function ChatProvider({
     [apiService, socketService, user?.id]
   );
 
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      try {
+        console.log('[ChatContext] Deleting message:', messageId, 'by user:', user?.id);
+        await apiService.deleteMessage(messageId, user?.id);
+        console.log('[ChatContext] Message deleted successfully');
+      } catch (error) {
+        console.error('[ChatContext] Failed to delete message', error);
+        throw error;
+      }
+    },
+    [apiService, user?.id]
+  );
+
   const addGroupMember = useCallback(
     async (conversationId: string, memberUserId: number) => {
       try {
@@ -962,6 +1080,7 @@ export function ChatProvider({
     stopTyping,
     addReaction,
     removeReaction,
+    deleteMessage,
     addGroupMember,
     removeGroupMember,
     setActiveConversation,

@@ -58,8 +58,8 @@ export function ConversationList({
     });
   };
 
-  const formatLastSeen = (lastSeen?: Date) => {
-    if (!lastSeen) return 'Offline';
+  const formatTimeDiff = (lastSeen?: Date) => {
+    if (!lastSeen) return null;
 
     const now = new Date();
     const lastSeenDate = new Date(lastSeen);
@@ -67,17 +67,25 @@ export function ConversationList({
       (now.getTime() - lastSeenDate.getTime()) / (1000 * 60)
     );
 
-    if (diffInMinutes < 1) return 'Online agora';
-    if (diffInMinutes < 60) return `Online há ${diffInMinutes} min`;
+    if (diffInMinutes < 1) return 'agora mesmo';
+    if (diffInMinutes < 60) return `há ${diffInMinutes} min`;
 
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours < 24) return `Online há ${diffInHours}h`;
+    if (diffInHours < 24) return `há ${diffInHours}h`;
 
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `Online há ${diffInDays}d`;
+    if (diffInDays < 7) return `há ${diffInDays}d`;
 
     const diffInWeeks = Math.floor(diffInDays / 7);
-    return `Online há ${diffInWeeks} semana${diffInWeeks > 1 ? 's' : ''}`;
+    return `há ${diffInWeeks} semana${diffInWeeks > 1 ? 's' : ''}`;
+  };
+
+  const formatLastSeen = (lastSeen?: Date) => {
+    const timeDiff = formatTimeDiff(lastSeen);
+    if (!timeDiff) return 'Offline';
+
+    if (timeDiff === 'agora mesmo') return 'Online agora';
+    return `Visto ${timeDiff}`;
   };
 
   if (conversations.length === 0) {
@@ -114,13 +122,23 @@ export function ConversationList({
     }
   };
 
-  const getStatusText = (status?: string, isOnline?: boolean, lastSeen?: Date) => {
-    // Se não está online via Socket.IO, mostrar "Offline" ou última vez visto
-    if (!isOnline) {
-      return formatLastSeen(lastSeen);
+  const getStatusText = (
+    status?: string,
+    isOnline?: boolean,
+    lastSeen?: Date
+  ) => {
+    // IMPORTANTE: Para usuários INVISIBLE ou OFFLINE (não conectados),
+    // nunca mostrar "Online agora"
+    if (status === 'INVISIBLE' || !isOnline) {
+      const timeDiff = formatTimeDiff(lastSeen);
+      if (!timeDiff) return 'Offline';
+
+      // Se foi visto recentemente mas NÃO está online, mostrar "Visto recentemente"
+      if (timeDiff === 'agora mesmo') return 'Visto recentemente';
+      return `Visto ${timeDiff}`;
     }
 
-    // Se está online, mostrar o status escolhido
+    // Se está online via Socket.IO, mostrar o status escolhido
     switch (status) {
       case 'BUSY':
         return 'Ocupado';
@@ -128,12 +146,10 @@ export function ConversationList({
         return 'Ausente';
       case 'OFFLINE':
         return 'Offline';
-      case 'INVISIBLE':
-        // Para invisível, mostrar última vez visto ao invés de "Offline"
-        return formatLastSeen(lastSeen);
       case 'ONLINE':
+        return 'Online';
       default:
-        return 'Online agora';
+        return 'Online';
     }
   };
 
@@ -152,43 +168,82 @@ export function ConversationList({
               key={conversation.id}
               onClick={() => onConversationSelect(conversation)}
               className={`
-                p-2.5 border-b border-gray-200 cursor-pointer transition-colors
+                py-1.5 px-2.5 border-b border-gray-200 cursor-pointer transition-colors
                 ${isActive ? 'bg-blue-50' : 'hover:bg-gray-50'}
               `}
             >
-              <div className='flex items-center gap-2.5'>
-                <div className='relative'>
-                  <div className='w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm'>
-                    {getConversationName(conversation).charAt(0).toUpperCase()}
+              <div className='flex items-center gap-1.5'>
+                {conversation.type === ConversationType.GROUP ? (
+                  // Avatares sobrepostos para grupos
+                  <div className='relative w-7 h-7 flex-shrink-0'>
+                    {/* Avatar 1 - Fundo */}
+                    <div className='absolute top-0 left-0 w-5 h-5 rounded-full bg-purple-500 text-white flex items-center justify-center text-[10px] border border-white'>
+                      {conversation.participants?.[0]?.user.firstName
+                        .charAt(0)
+                        .toUpperCase() || 'G'}
+                    </div>
+                    {/* Avatar 2 - Meio */}
+                    <div className='absolute top-0.5 left-1 w-5 h-5 rounded-full bg-pink-500 text-white flex items-center justify-center text-[10px] border border-white'>
+                      {conversation.participants?.[1]?.user.firstName
+                        .charAt(0)
+                        .toUpperCase() || 'R'}
+                    </div>
+                    {/* Avatar 3 - Frente */}
+                    <div className='absolute top-1 left-2 w-5 h-5 rounded-full bg-blue-500 text-white flex items-center justify-center text-[10px] border border-white'>
+                      {conversation.participants?.[2]?.user.firstName
+                        .charAt(0)
+                        .toUpperCase() || 'G'}
+                    </div>
                   </div>
-                  {otherUser && (
-                    <div
-                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${getStatusColor(userStatus, isOnline)}`}
-                    ></div>
-                  )}
-                </div>
+                ) : (
+                  // Avatar normal para conversas diretas
+                  <div className='relative'>
+                    <div className='w-7 h-7 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-xs'>
+                      {getConversationName(conversation)
+                        .charAt(0)
+                        .toUpperCase()}
+                    </div>
+                    {otherUser && (
+                      <div
+                        className={`absolute bottom-0 right-0 w-2 h-2 rounded-full ${getStatusColor(userStatus, isOnline)}`}
+                      ></div>
+                    )}
+                  </div>
+                )}
                 <div className='flex-1 min-w-0'>
-                  <div className='flex justify-between items-center mb-0.5'>
-                    <h3 className='font-semibold text-sm text-gray-900 truncate'>
+                  <div className='flex justify-between items-center mb-0'>
+                    <h3 className='font-semibold text-xs text-gray-900 truncate'>
                       {getConversationName(conversation)}
                     </h3>
                     {lastMessage && (
-                      <span className='text-xs text-gray-500 ml-2 flex-shrink-0'>
+                      <span className='text-[10px] text-gray-500 ml-2 flex-shrink-0'>
                         {formatTime(lastMessage.createdAt)}
                       </span>
                     )}
                   </div>
                   {conversation.unreadCount > 0 ? (
-                    <p className='text-xs text-gray-900 font-semibold truncate'>
+                    <p className='text-[10px] text-gray-900 font-semibold truncate'>
                       {conversation.unreadCount}{' '}
                       {conversation.unreadCount === 1
                         ? 'nova mensagem'
                         : 'novas mensagens'}
                     </p>
+                  ) : conversation.type === ConversationType.GROUP &&
+                    lastMessage ? (
+                    <p className='text-[10px] text-gray-500 truncate'>
+                      {lastMessage.sender.firstName}:{' '}
+                      {lastMessage.isDeleted
+                        ? 'Mensagem excluída'
+                        : lastMessage.content}
+                    </p>
                   ) : (
                     otherUser && (
-                      <p className='text-xs text-gray-500 truncate'>
-                        {getStatusText(userStatus, isOnline, otherUser.lastSeen)}
+                      <p className='text-[10px] text-gray-500 truncate'>
+                        {getStatusText(
+                          userStatus,
+                          isOnline,
+                          otherUser.lastSeen
+                        )}
                       </p>
                     )
                   )}

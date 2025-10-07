@@ -149,9 +149,11 @@ export class ChatApiService {
     return response.data;
   }
 
-  async deleteMessage(messageId: string): Promise<ApiResponse<void>> {
+  async deleteMessage(messageId: string, userId?: number): Promise<ApiResponse<void>> {
     const response: AxiosResponse<ApiResponse<void>> =
-      await this.api.delete(`/messages/${messageId}`);
+      await this.api.delete(`/chat/messages/${messageId}`, {
+        params: { userId }
+      });
     return response.data;
   }
 

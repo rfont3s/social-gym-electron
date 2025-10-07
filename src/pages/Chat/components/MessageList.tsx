@@ -7,6 +7,7 @@ interface MessageListProps {
   className?: string;
   onAddReaction?: (messageId: string, emoji: string) => void;
   onRemoveReaction?: (messageId: string, emoji: string) => void;
+  onDeleteMessage?: (messageId: string) => void;
 }
 
 export function MessageList({
@@ -15,6 +16,7 @@ export function MessageList({
   className = '',
   onAddReaction,
   onRemoveReaction,
+  onDeleteMessage,
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
@@ -40,6 +42,13 @@ export function MessageList({
       month: 'long',
       year: 'numeric',
     });
+  };
+
+  const canDeleteMessage = (message: Message) => {
+    const now = new Date();
+    const messageTime = new Date(message.createdAt);
+    const diffInMinutes = (now.getTime() - messageTime.getTime()) / (1000 * 60);
+    return diffInMinutes <= 2;
   };
 
   const shouldShowDateSeparator = (
@@ -148,12 +157,18 @@ export function MessageList({
                         </div>
                       )}
 
-                      <p className='text-sm whitespace-pre-wrap pr-12'>
-                        {message.content}
-                      </p>
+                      {message.isDeleted ? (
+                        <p className='text-sm italic opacity-60 pr-12'>
+                          Mensagem excluída
+                        </p>
+                      ) : (
+                        <p className='text-sm whitespace-pre-wrap pr-12'>
+                          {message.content}
+                        </p>
+                      )}
 
                       <div className='flex items-center gap-1 absolute bottom-1 right-2'>
-                        {message.isEdited && (
+                        {message.isEdited && !message.isDeleted && (
                           <span
                             className={`text-[10px] italic ${isOwnMessage ? 'text-blue-100' : 'text-gray-500'}`}
                           >
@@ -170,7 +185,7 @@ export function MessageList({
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
-                      <div className='flex gap-1 mt-1 px-2 flex-wrap'>
+                      <div className='flex gap-0.5 mt-0.5 px-2 flex-wrap'>
                         {/* Group reactions by emoji */}
                         {Object.entries(
                           message.reactions.reduce((acc, reaction) => {
@@ -191,15 +206,15 @@ export function MessageList({
                                   onAddReaction?.(message.id, emoji);
                                 }
                               }}
-                              className={`text-xs rounded-full px-2 py-1 flex items-center gap-1 transition-colors ${
+                              className={`text-[10px] rounded-full px-1.5 py-0.5 flex items-center gap-0.5 transition-colors ${
                                 userReacted
                                   ? 'bg-blue-100 border border-blue-300'
                                   : 'bg-white border border-gray-300 hover:bg-gray-100'
                               }`}
                             >
-                              <span>{emoji}</span>
+                              <span className='text-xs'>{emoji}</span>
                               {reactions.length > 1 && (
-                                <span className='text-[10px] text-gray-600'>
+                                <span className='text-[9px] text-gray-600'>
                                   {reactions.length}
                                 </span>
                               )}
@@ -211,15 +226,33 @@ export function MessageList({
                   </div>
                 </div>
 
-                {/* Reaction button (appears on hover) */}
-                {hoveredMessageId === message.id && (
-                  <button
-                    onClick={() => setShowReactionPicker(showReactionPicker === message.id ? null : message.id)}
-                    className={`absolute -top-3 ${isOwnMessage ? 'right-2' : 'left-2'} p-1.5 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors opacity-0 group-hover:opacity-100 z-10`}
-                    title='Adicionar reação'
-                  >
-                    <span className='text-base leading-none'>😊</span>
-                  </button>
+                {/* Action buttons (appear on hover) */}
+                {hoveredMessageId === message.id && !message.isDeleted && (
+                  <div className={`absolute -top-3 ${isOwnMessage ? 'right-2' : 'left-2'} flex gap-1 opacity-0 group-hover:opacity-100 z-10`}>
+                    <button
+                      onClick={() => setShowReactionPicker(showReactionPicker === message.id ? null : message.id)}
+                      className='p-1 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors w-7 h-7 flex items-center justify-center'
+                      title='Adicionar reação'
+                    >
+                      <span className='text-base leading-none'>😊</span>
+                    </button>
+
+                    {isOwnMessage && onDeleteMessage && canDeleteMessage(message) && (
+                      <button
+                        onClick={() => {
+                          if (window.confirm('Tem certeza que deseja excluir esta mensagem?')) {
+                            onDeleteMessage(message.id);
+                          }
+                        }}
+                        className='p-1 bg-white border border-gray-300 rounded-full shadow-md hover:bg-red-50 hover:border-red-300 transition-colors w-7 h-7 flex items-center justify-center'
+                        title='Excluir mensagem (até 2 minutos após o envio)'
+                      >
+                        <svg className='w-4 h-4 text-gray-600 hover:text-red-600' fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 )}
 
                 {/* Reaction picker */}

@@ -31,6 +31,7 @@ export function ChatPage() {
     disconnect,
     addReaction,
     removeReaction,
+    deleteMessage,
     addGroupMember,
     removeGroupMember,
   } = useChatContext();
@@ -272,6 +273,7 @@ export function ChatPage() {
               className='flex-1'
               onAddReaction={addReaction}
               onRemoveReaction={removeReaction}
+              onDeleteMessage={deleteMessage}
             />
 
             {/* Message Input */}
