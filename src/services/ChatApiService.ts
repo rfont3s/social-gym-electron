@@ -165,19 +165,22 @@ export class ChatApiService {
   }
 
   // Reactions
-  async addReaction(messageId: string, emoji: string): Promise<ApiResponse<void>> {
+  async addReaction(messageId: string, emoji: string, userId?: number): Promise<ApiResponse<void>> {
     const response: AxiosResponse<ApiResponse<void>> = await this.api.post(
-      `/messages/${messageId}/reactions`,
-      {
-        emoji,
-      },
+      `/chat/messages/${messageId}/reactions`,
+      { emoji },
+      { params: { userId } }
     );
     return response.data;
   }
 
-  async removeReaction(messageId: string, emoji: string): Promise<ApiResponse<void>> {
+  async removeReaction(messageId: string, emoji: string, userId?: number): Promise<ApiResponse<void>> {
     const response: AxiosResponse<ApiResponse<void>> = await this.api.delete(
-      `/messages/${messageId}/reactions/${emoji}`,
+      `/chat/messages/${messageId}/reactions`,
+      {
+        data: { emoji },
+        params: { userId }
+      }
     );
     return response.data;
   }

@@ -459,6 +459,67 @@ export function ChatProvider({
       });
     });
 
+    // Reaction events
+    socketService.on('reaction_added', (data: { messageId: string; userId: number; emoji: string }) => {
+      console.log('[ChatContext] Reaction added:', data);
+
+      setState(prev => {
+        const activeConv = prev.activeConversation;
+        if (!activeConv) return prev;
+
+        const messages = activeConv.messages?.map(msg => {
+          if (msg.id === data.messageId) {
+            const reactions = msg.reactions || [];
+            const existingReaction = reactions.find(r => r.userId === data.userId && r.emoji === data.emoji);
+
+            if (!existingReaction) {
+              return {
+                ...msg,
+                reactions: [...reactions, {
+                  id: `${data.messageId}-${data.userId}-${data.emoji}`,
+                  messageId: data.messageId,
+                  userId: data.userId,
+                  emoji: data.emoji,
+                  createdAt: new Date(),
+                  user: { id: data.userId, firstName: '', lastName: '', email: '' }
+                }]
+              };
+            }
+          }
+          return msg;
+        });
+
+        return {
+          ...prev,
+          activeConversation: { ...activeConv, messages }
+        };
+      });
+    });
+
+    socketService.on('reaction_removed', (data: { messageId: string; userId: number; emoji: string }) => {
+      console.log('[ChatContext] Reaction removed:', data);
+
+      setState(prev => {
+        const activeConv = prev.activeConversation;
+        if (!activeConv) return prev;
+
+        const messages = activeConv.messages?.map(msg => {
+          if (msg.id === data.messageId) {
+            const reactions = (msg.reactions || []).filter(
+              r => !(r.userId === data.userId && r.emoji === data.emoji)
+            );
+            return { ...msg, reactions };
+          }
+          return msg;
+        });
+
+        return {
+          ...prev,
+          activeConversation: { ...activeConv, messages }
+        };
+      });
+    });
+
     // Atualizar status online periodicamente (a cada 5 segundos)
     const interval = setInterval(updateOnlineStatus, 5000);
 
@@ -473,6 +534,8 @@ export function ChatProvider({
       socketService.off(SocketEvents.CONVERSATION_CREATED);
       socketService.off('conversation_online_users');
       socketService.off('user_online_status');
+      socketService.off('reaction_added');
+      socketService.off('reaction_removed');
     };
   }, [socketService, apiService, markAsRead]);
 
@@ -706,25 +769,25 @@ export function ChatProvider({
   const addReaction = useCallback(
     async (messageId: string, emoji: string) => {
       try {
-        await apiService.addReaction(messageId, emoji);
+        await apiService.addReaction(messageId, emoji, user?.id);
         socketService.addReaction({ messageId, emoji });
       } catch (error) {
         console.error('Failed to add reaction', error);
       }
     },
-    [apiService, socketService]
+    [apiService, socketService, user?.id]
   );
 
   const removeReaction = useCallback(
     async (messageId: string, emoji: string) => {
       try {
-        await apiService.removeReaction(messageId, emoji);
+        await apiService.removeReaction(messageId, emoji, user?.id);
         socketService.removeReaction({ messageId, emoji });
       } catch (error) {
         console.error('Failed to remove reaction', error);
       }
     },
-    [apiService, socketService]
+    [apiService, socketService, user?.id]
   );
 
   const setActiveConversation = useCallback(

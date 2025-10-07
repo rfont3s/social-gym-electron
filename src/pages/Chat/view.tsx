@@ -28,6 +28,8 @@ export function ChatPage() {
     updateUserStatus,
     connect,
     disconnect,
+    addReaction,
+    removeReaction,
   } = useChatContext();
 
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] =
@@ -223,6 +225,8 @@ export function ChatPage() {
               messages={activeConversation.messages || []}
               currentUser={currentUser}
               className='flex-1'
+              onAddReaction={addReaction}
+              onRemoveReaction={removeReaction}
             />
 
             {/* Message Input */}

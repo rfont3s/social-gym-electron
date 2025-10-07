@@ -1,18 +1,26 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import type { Message, User } from '../../../types/chat';
 
 interface MessageListProps {
   messages: Message[];
   currentUser?: User;
   className?: string;
+  onAddReaction?: (messageId: string, emoji: string) => void;
+  onRemoveReaction?: (messageId: string, emoji: string) => void;
 }
 
 export function MessageList({
   messages,
   currentUser,
   className = '',
+  onAddReaction,
+  onRemoveReaction,
 }: MessageListProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [hoveredMessageId, setHoveredMessageId] = useState<string | null>(null);
+  const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null);
+
+  const availableReactions = ['👍', '❤️', '😂', '😮', '😢', '🙏'];
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -88,7 +96,9 @@ export function MessageList({
               )}
 
               <div
-                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-1`}
+                className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'} mb-1 group relative`}
+                onMouseEnter={() => setHoveredMessageId(message.id)}
+                onMouseLeave={() => setHoveredMessageId(null)}
               >
                 <div
                   className={`flex gap-2 max-w-[70%] ${isOwnMessage ? 'flex-row-reverse' : 'flex-row'}`}
@@ -160,19 +170,82 @@ export function MessageList({
 
                     {/* Reactions */}
                     {message.reactions && message.reactions.length > 0 && (
-                      <div className='flex gap-1 mt-1 px-2'>
-                        {message.reactions.map(reaction => (
-                          <span
-                            key={reaction.id}
-                            className='text-xs bg-white border border-gray-300 rounded-full px-2 py-1'
-                          >
-                            {reaction.emoji}
-                          </span>
-                        ))}
+                      <div className='flex gap-1 mt-1 px-2 flex-wrap'>
+                        {/* Group reactions by emoji */}
+                        {Object.entries(
+                          message.reactions.reduce((acc, reaction) => {
+                            const key = reaction.emoji;
+                            if (!acc[key]) acc[key] = [];
+                            acc[key].push(reaction);
+                            return acc;
+                          }, {} as Record<string, typeof message.reactions>)
+                        ).map(([emoji, reactions]) => {
+                          const userReacted = reactions.some(r => r.userId === currentUser?.id);
+                          return (
+                            <button
+                              key={emoji}
+                              onClick={() => {
+                                if (userReacted) {
+                                  onRemoveReaction?.(message.id, emoji);
+                                } else {
+                                  onAddReaction?.(message.id, emoji);
+                                }
+                              }}
+                              className={`text-xs rounded-full px-2 py-1 flex items-center gap-1 transition-colors ${
+                                userReacted
+                                  ? 'bg-blue-100 border border-blue-300'
+                                  : 'bg-white border border-gray-300 hover:bg-gray-100'
+                              }`}
+                            >
+                              <span>{emoji}</span>
+                              {reactions.length > 1 && (
+                                <span className='text-[10px] text-gray-600'>
+                                  {reactions.length}
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
                 </div>
+
+                {/* Reaction button (appears on hover) */}
+                {hoveredMessageId === message.id && (
+                  <button
+                    onClick={() => setShowReactionPicker(showReactionPicker === message.id ? null : message.id)}
+                    className={`absolute -top-3 ${isOwnMessage ? 'right-2' : 'left-2'} p-1.5 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-50 transition-colors opacity-0 group-hover:opacity-100 z-10`}
+                    title='Adicionar reação'
+                  >
+                    <span className='text-base leading-none'>😊</span>
+                  </button>
+                )}
+
+                {/* Reaction picker */}
+                {showReactionPicker === message.id && (
+                  <>
+                    {/* Backdrop to close picker */}
+                    <div
+                      className='fixed inset-0 z-30'
+                      onClick={() => setShowReactionPicker(null)}
+                    />
+                    <div className={`absolute z-40 -top-12 ${isOwnMessage ? 'right-2' : 'left-2'} bg-white border border-gray-300 rounded-lg shadow-xl p-2 flex gap-1`}>
+                      {availableReactions.map(emoji => (
+                        <button
+                          key={emoji}
+                          onClick={() => {
+                            onAddReaction?.(message.id, emoji);
+                            setShowReactionPicker(null);
+                          }}
+                          className='text-xl hover:bg-gray-100 rounded p-1.5 transition-colors'
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           );
