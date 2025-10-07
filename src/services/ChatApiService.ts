@@ -187,7 +187,7 @@ export class ChatApiService {
 
   // Users
   async getUsers(search?: string): Promise<ApiResponse<User[]>> {
-    const response: AxiosResponse<ApiResponse<User[]>> = await this.api.get('/users', {
+    const response: AxiosResponse<ApiResponse<User[]>> = await this.api.get('/chat/users', {
       params: { search },
     });
     return response.data;
@@ -243,6 +243,39 @@ export class ChatApiService {
       { params: { userId } }
     );
     return response.data;
+  }
+
+  // Add member to group
+  async addGroupMember(conversationId: string, memberUserId: number, currentUserId?: number): Promise<ApiResponse<any>> {
+    console.log('[ChatApiService] POST /chat/conversations/' + conversationId + '/members', 'memberUserId:', memberUserId, 'currentUserId:', currentUserId);
+    try {
+      const response: AxiosResponse<ApiResponse<any>> = await this.api.post(
+        `/chat/conversations/${conversationId}/members`,
+        { userId: memberUserId },
+        { params: { userId: currentUserId } }
+      );
+      console.log('[ChatApiService] Add member response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[ChatApiService] Error adding member:', error.response?.data);
+      throw error;
+    }
+  }
+
+  // Remove member from group
+  async removeGroupMember(conversationId: string, memberUserId: number, currentUserId?: number): Promise<ApiResponse<void>> {
+    console.log('[ChatApiService] DELETE /chat/conversations/' + conversationId + '/members/' + memberUserId, 'userId:', currentUserId);
+    try {
+      const response: AxiosResponse<ApiResponse<void>> = await this.api.delete(
+        `/chat/conversations/${conversationId}/members/${memberUserId}`,
+        { params: { userId: currentUserId } }
+      );
+      console.log('[ChatApiService] Remove member response:', response.data);
+      return response.data;
+    } catch (error: any) {
+      console.error('[ChatApiService] Error response:', error.response?.data);
+      throw error;
+    }
   }
 
   // Utility method to get file URL

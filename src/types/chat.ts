@@ -225,6 +225,8 @@ export interface ChatContextValue extends ChatState {
   stopTyping: (conversationId: string) => void;
   addReaction: (messageId: string, emoji: string) => Promise<void>;
   removeReaction: (messageId: string, emoji: string) => Promise<void>;
+  addGroupMember: (conversationId: string, memberUserId: number) => Promise<void>;
+  removeGroupMember: (conversationId: string, memberUserId: number) => Promise<void>;
   setActiveConversation: (conversation?: Conversation) => Promise<void>;
   uploadFile: (file: File, conversationId: string) => Promise<void>;
 

@@ -4,3 +4,4 @@ export { MessageInput } from './MessageInput';
 export { ChatHeader } from './ChatHeader';
 export { NewConversationModal } from './NewConversationModal';
 export { StatusSelector } from './StatusSelector';
+export { GroupMembersModal } from './GroupMembersModal';

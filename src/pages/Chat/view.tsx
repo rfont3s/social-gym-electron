@@ -7,6 +7,7 @@ import {
   MessageInput,
   ChatHeader,
   NewConversationModal,
+  GroupMembersModal,
 } from './components';
 import { StatusSelector, type UserStatus } from './components/StatusSelector';
 import { MessageType } from '../../types/chat';
@@ -30,9 +31,13 @@ export function ChatPage() {
     disconnect,
     addReaction,
     removeReaction,
+    addGroupMember,
+    removeGroupMember,
   } = useChatContext();
 
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] =
+    useState(false);
+  const [isGroupMembersModalOpen, setIsGroupMembersModalOpen] =
     useState(false);
 
   // Load conversations on mount
@@ -127,6 +132,45 @@ export function ChatPage() {
     connect();
   };
 
+  const handleAddMember = async (userId: number) => {
+    if (activeConversation) {
+      console.log('[ChatPage] Adding member:', userId, 'to conversation:', activeConversation.id);
+      console.log('[ChatPage] Current participants:', activeConversation.participants?.map(p => ({ userId: p.userId, leftAt: p.leftAt })));
+
+      try {
+        await addGroupMember(activeConversation.id, userId);
+
+        // Wait a bit for Socket.IO event to arrive and update state
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // If Socket.IO didn't update, force reload
+        await loadConversations();
+      } catch (error) {
+        console.error('[ChatPage] Error adding member:', error);
+        alert('Erro ao adicionar membro: ' + (error as any).message);
+      }
+    }
+  };
+
+  const handleRemoveMember = async (userId: number) => {
+    if (activeConversation) {
+      const conversationId = activeConversation.id;
+
+      try {
+        await removeGroupMember(conversationId, userId);
+
+        // Wait a bit for Socket.IO event to arrive and update state
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // If Socket.IO didn't update, force reload
+        await loadConversations();
+      } catch (error) {
+        console.error('[ChatPage] Error removing member:', error);
+        alert('Erro ao remover membro: ' + (error as any).message);
+      }
+    }
+  };
+
   // Se o status é OFFLINE, mostrar tela de reconexão
   if (currentUser?.status === 'OFFLINE') {
     return (
@@ -218,6 +262,7 @@ export function ChatPage() {
             <ChatHeader
               conversation={activeConversation}
               currentUser={currentUser}
+              onManageMembers={() => setIsGroupMembersModalOpen(true)}
             />
 
             {/* Messages */}
@@ -260,6 +305,30 @@ export function ChatPage() {
         onCreateConversation={handleCreateConversation}
         currentUserId={currentUser?.id}
       />
+
+      {/* Group Members Modal */}
+      {activeConversation && (
+        <GroupMembersModal
+          isOpen={isGroupMembersModalOpen}
+          onClose={() => setIsGroupMembersModalOpen(false)}
+          conversation={activeConversation}
+          currentUserId={currentUser?.id}
+          onAddMember={handleAddMember}
+          onRemoveMember={handleRemoveMember}
+          onSearchUsers={async (search) => {
+            // Use the existing getUsers from ChatApiService
+            console.log('[ChatPage] Searching users with term:', search);
+            const chatApi = new (await import('../../services/ChatApiService')).ChatApiService(
+              'http://localhost:3001/api',
+              () => null
+            );
+            const response = await chatApi.getUsers(search);
+            console.log('[ChatPage] getUsers response:', response);
+            console.log('[ChatPage] Users found:', response.data?.length || 0);
+            return response.data || [];
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -520,6 +520,73 @@ export function ChatProvider({
       });
     });
 
+    // Group member events
+    socketService.on(SocketEvents.USER_JOINED_CONVERSATION, async (data: { conversationId: string; user: any }) => {
+      console.log('[ChatContext] User joined conversation:', data);
+      console.log('[ChatContext] Current activeConversation:', state.activeConversation?.id);
+
+      // Reload conversation data from API
+      try {
+        const currentUserId = user?.id ? Number(user.id) : 1;
+        console.log('[ChatContext] Reloading conversations for userId:', currentUserId);
+        const response = await apiService.getConversations({ userId: currentUserId });
+        console.log('[ChatContext] Conversations loaded:', response.data?.length);
+
+        if (response.success && response.data) {
+          setState(prev => {
+            // Update activeConversation if it's the one that changed
+            const updatedActiveConv = prev.activeConversation?.id === data.conversationId
+              ? response.data.find(c => c.id === data.conversationId)
+              : prev.activeConversation;
+
+            console.log('[ChatContext] Previous active participants:', prev.activeConversation?.participants?.length);
+            console.log('[ChatContext] Updated active participants:', updatedActiveConv?.participants?.length);
+
+            return {
+              ...prev,
+              conversations: response.data,
+              activeConversation: updatedActiveConv,
+            };
+          });
+        }
+      } catch (error) {
+        console.error('[ChatContext] Error reloading conversations:', error);
+      }
+    });
+
+    socketService.on(SocketEvents.USER_LEFT_CONVERSATION, async (data: { conversationId: string; userId: number }) => {
+      console.log('[ChatContext] User left conversation:', data);
+      console.log('[ChatContext] Current activeConversation:', state.activeConversation?.id);
+
+      // Reload conversation data from API
+      try {
+        const currentUserId = user?.id ? Number(user.id) : 1;
+        console.log('[ChatContext] Reloading conversations for userId:', currentUserId);
+        const response = await apiService.getConversations({ userId: currentUserId });
+        console.log('[ChatContext] Conversations loaded:', response.data?.length);
+
+        if (response.success && response.data) {
+          setState(prev => {
+            // Update activeConversation if it's the one that changed
+            const updatedActiveConv = prev.activeConversation?.id === data.conversationId
+              ? response.data.find(c => c.id === data.conversationId)
+              : prev.activeConversation;
+
+            console.log('[ChatContext] Previous active participants:', prev.activeConversation?.participants?.length);
+            console.log('[ChatContext] Updated active participants:', updatedActiveConv?.participants?.length);
+
+            return {
+              ...prev,
+              conversations: response.data,
+              activeConversation: updatedActiveConv,
+            };
+          });
+        }
+      } catch (error) {
+        console.error('[ChatContext] Error reloading conversations:', error);
+      }
+    });
+
     // Atualizar status online periodicamente (a cada 5 segundos)
     const interval = setInterval(updateOnlineStatus, 5000);
 
@@ -532,12 +599,14 @@ export function ChatProvider({
       socketService.off(SocketEvents.USER_TYPING);
       socketService.off(SocketEvents.USER_STOPPED_TYPING);
       socketService.off(SocketEvents.CONVERSATION_CREATED);
+      socketService.off(SocketEvents.USER_JOINED_CONVERSATION);
+      socketService.off(SocketEvents.USER_LEFT_CONVERSATION);
       socketService.off('conversation_online_users');
       socketService.off('user_online_status');
       socketService.off('reaction_added');
       socketService.off('reaction_removed');
     };
-  }, [socketService, apiService, markAsRead]);
+  }, [socketService, apiService, markAsRead, user]);
 
   const connect = useCallback(() => {
     const token = getAuthToken?.() || undefined;
@@ -790,6 +859,34 @@ export function ChatProvider({
     [apiService, socketService, user?.id]
   );
 
+  const addGroupMember = useCallback(
+    async (conversationId: string, memberUserId: number) => {
+      try {
+        console.log('[ChatContext] Adding member:', memberUserId, 'to conversation:', conversationId, 'by user:', user?.id);
+        await apiService.addGroupMember(conversationId, memberUserId, user?.id);
+        console.log('[ChatContext] Member added successfully');
+      } catch (error) {
+        console.error('[ChatContext] Failed to add group member', error);
+        throw error;
+      }
+    },
+    [apiService, user?.id]
+  );
+
+  const removeGroupMember = useCallback(
+    async (conversationId: string, memberUserId: number) => {
+      try {
+        console.log('[ChatContext] Removing member:', memberUserId, 'from conversation:', conversationId, 'by user:', user?.id);
+        await apiService.removeGroupMember(conversationId, memberUserId, user?.id);
+        console.log('[ChatContext] Member removed successfully');
+      } catch (error) {
+        console.error('[ChatContext] Failed to remove group member', error);
+        throw error;
+      }
+    },
+    [apiService, user?.id]
+  );
+
   const setActiveConversation = useCallback(
     async (conversation?: Conversation) => {
       // Reset unreadCount to 0 for the conversation being opened
@@ -865,6 +962,8 @@ export function ChatProvider({
     stopTyping,
     addReaction,
     removeReaction,
+    addGroupMember,
+    removeGroupMember,
     setActiveConversation,
     uploadFile,
     connect,
