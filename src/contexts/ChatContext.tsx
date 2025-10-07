@@ -149,7 +149,15 @@ export function ChatProvider({
 
     // Message events
     socketService.on(SocketEvents.NEW_MESSAGE, (message: Message) => {
-      console.log('[ChatContext] Received new_message:', message.id);
+      console.log('[ChatContext] ===== NEW_MESSAGE EVENT RECEIVED =====');
+      console.log(
+        '[ChatContext] Message ID:',
+        message.id,
+        'Conversation:',
+        message.conversationId,
+        'Sender:',
+        message.senderId
+      );
       setState(prev => {
         const conversations = prev.conversations.map(conv => {
           if (conv.id === message.conversationId) {
@@ -171,6 +179,17 @@ export function ChatProvider({
             const shouldIncrementUnread =
               !isActiveConversation && !isOwnMessage;
 
+            console.log(
+              '[ChatContext] Unread logic - isActiveConversation:',
+              isActiveConversation,
+              'isOwnMessage:',
+              isOwnMessage,
+              'shouldIncrementUnread:',
+              shouldIncrementUnread,
+              'currentUnreadCount:',
+              conv.unreadCount
+            );
+
             // Se for a conversa ativa e não for mensagem própria, marcar como lida imediatamente
             if (isActiveConversation && !isOwnMessage && prev.currentUser?.id) {
               markAsRead(conv.id, message.id).catch(err =>
@@ -181,13 +200,17 @@ export function ChatProvider({
               );
             }
 
+            const newUnreadCount = shouldIncrementUnread
+              ? (conv.unreadCount || 0) + 1
+              : conv.unreadCount;
+
+            console.log('[ChatContext] New unreadCount:', newUnreadCount);
+
             return {
               ...conv,
               messages: [...conv.messages, message],
               lastMessage: message,
-              unreadCount: shouldIncrementUnread
-                ? (conv.unreadCount || 0) + 1
-                : conv.unreadCount,
+              unreadCount: newUnreadCount,
             };
           }
           return conv;
@@ -609,13 +632,8 @@ export function ChatProvider({
 
   const setActiveConversation = useCallback(
     async (conversation?: Conversation) => {
-      // Leave previous conversation if any
+      // Reset unreadCount to 0 for the conversation being opened
       setState(prev => {
-        if (prev.activeConversation) {
-          socketService.leaveConversation(prev.activeConversation.id);
-        }
-
-        // Reset unreadCount to 0 for the conversation being opened
         const conversations = prev.conversations.map(conv =>
           conv.id === conversation?.id ? { ...conv, unreadCount: 0 } : conv
         );
@@ -624,6 +642,7 @@ export function ChatProvider({
       });
 
       if (conversation) {
+        // Join conversation if not already joined (backend auto-joins on connect)
         socketService.joinConversation(conversation.id);
         // Load messages for this conversation and get them returned
         const messages = await loadMessages(conversation.id);

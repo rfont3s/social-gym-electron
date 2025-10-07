@@ -23,7 +23,7 @@ export function ConversationList({
 
     // For direct messages, show the other user's name
     const otherParticipant = conversation.participants?.find(
-      (p) => p.userId !== currentUser?.id
+      p => p.userId !== currentUser?.id
     );
 
     return otherParticipant
@@ -36,15 +36,15 @@ export function ConversationList({
       return null;
     }
 
-    return conversation.participants?.find(
-      (p) => p.userId !== currentUser?.id
-    )?.user;
+    return conversation.participants?.find(p => p.userId !== currentUser?.id)
+      ?.user;
   };
 
   const formatTime = (date: Date) => {
     const now = new Date();
     const messageDate = new Date(date);
-    const diffInHours = (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
+    const diffInHours =
+      (now.getTime() - messageDate.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 24) {
       return messageDate.toLocaleTimeString('pt-BR', {
@@ -52,16 +52,45 @@ export function ConversationList({
         minute: '2-digit',
       });
     }
-    return messageDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    return messageDate.toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+  };
+
+  const formatLastSeen = (lastSeen?: Date) => {
+    if (!lastSeen) return 'Offline';
+
+    const now = new Date();
+    const lastSeenDate = new Date(lastSeen);
+    const diffInMinutes = Math.floor(
+      (now.getTime() - lastSeenDate.getTime()) / (1000 * 60)
+    );
+
+    if (diffInMinutes < 1) return 'Online agora';
+    if (diffInMinutes < 60) return `Online há ${diffInMinutes} min`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `Online há ${diffInHours}h`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `Online há ${diffInDays}d`;
+
+    const diffInWeeks = Math.floor(diffInDays / 7);
+    return `Online há ${diffInWeeks} semana${diffInWeeks > 1 ? 's' : ''}`;
   };
 
   if (conversations.length === 0) {
     return (
-      <div className={`flex items-center justify-center h-full text-gray-500 ${className}`}>
-        <div className="text-center p-4">
-          <div className="text-4xl mb-2">💬</div>
+      <div
+        className={`flex items-center justify-center h-full text-gray-500 ${className}`}
+      >
+        <div className='text-center p-4'>
+          <div className='text-4xl mb-2'>💬</div>
           <p>Nenhuma conversa ainda</p>
-          <p className="text-sm text-gray-400 mt-1">Inicie uma nova conversa para começar</p>
+          <p className='text-sm text-gray-400 mt-1'>
+            Inicie uma nova conversa para começar
+          </p>
         </div>
       </div>
     );
@@ -69,8 +98,8 @@ export function ConversationList({
 
   return (
     <div className={`flex flex-col h-full overflow-hidden ${className}`}>
-      <div className="flex-1 overflow-y-auto">
-        {conversations.map((conversation) => {
+      <div className='flex-1 overflow-y-auto'>
+        {conversations.map(conversation => {
           const isActive = activeConversation?.id === conversation.id;
           const lastMessage = conversation.lastMessage;
           const otherUser = getOtherUser(conversation);
@@ -81,34 +110,47 @@ export function ConversationList({
               key={conversation.id}
               onClick={() => onConversationSelect(conversation)}
               className={`
-                p-4 border-b border-gray-200 cursor-pointer transition-colors
+                p-2.5 border-b border-gray-200 cursor-pointer transition-colors
                 ${isActive ? 'bg-blue-50' : 'hover:bg-gray-50'}
               `}
             >
-              <div className="flex items-start gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm">
+              <div className='flex items-center gap-2.5'>
+                <div className='relative'>
+                  <div className='w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center flex-shrink-0 text-sm'>
                     {getConversationName(conversation).charAt(0).toUpperCase()}
                   </div>
                   {otherUser && (
-                    <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${isOnline ? 'bg-green-500' : 'bg-white border-gray-300'}`}></div>
+                    <div
+                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500 border-2 border-white' : 'bg-white border-2 border-gray-400'}`}
+                    ></div>
                   )}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start mb-1">
-                    <h3 className="font-semibold text-gray-900 truncate">
+                <div className='flex-1 min-w-0'>
+                  <div className='flex justify-between items-center mb-0.5'>
+                    <h3 className='font-semibold text-sm text-gray-900 truncate'>
                       {getConversationName(conversation)}
                     </h3>
                     {lastMessage && (
-                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                      <span className='text-xs text-gray-500 ml-2 flex-shrink-0'>
                         {formatTime(lastMessage.createdAt)}
                       </span>
                     )}
                   </div>
-                  {conversation.unreadCount > 0 && (
-                    <p className="text-sm text-gray-900 font-semibold truncate">
-                      {conversation.unreadCount} {conversation.unreadCount === 1 ? 'nova mensagem' : 'novas mensagens'}
+                  {conversation.unreadCount > 0 ? (
+                    <p className='text-xs text-gray-900 font-semibold truncate'>
+                      {conversation.unreadCount}{' '}
+                      {conversation.unreadCount === 1
+                        ? 'nova mensagem'
+                        : 'novas mensagens'}
                     </p>
+                  ) : (
+                    otherUser && (
+                      <p className='text-xs text-gray-500 truncate'>
+                        {isOnline
+                          ? 'Online agora'
+                          : formatLastSeen(otherUser.lastSeen)}
+                      </p>
+                    )
                   )}
                 </div>
               </div>
