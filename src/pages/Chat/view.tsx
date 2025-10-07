@@ -8,6 +8,7 @@ import {
   ChatHeader,
   NewConversationModal,
 } from './components';
+import { StatusSelector, type UserStatus } from './components/StatusSelector';
 import { MessageType } from '../../types/chat';
 
 export function ChatPage() {
@@ -24,6 +25,9 @@ export function ChatPage() {
     createConversation,
     startTyping,
     stopTyping,
+    updateUserStatus,
+    connect,
+    disconnect,
   } = useChatContext();
 
   const [isNewConversationModalOpen, setIsNewConversationModalOpen] =
@@ -105,6 +109,45 @@ export function ChatPage() {
     }
   };
 
+  const handleStatusChange = async (status: UserStatus) => {
+    await updateUserStatus(status);
+
+    if (status === 'OFFLINE') {
+      // Desconectar do Socket.IO quando escolher OFFLINE
+      console.log('[Chat] Disconnecting from Socket.IO');
+      disconnect();
+    }
+  };
+
+  const handleReconnect = async () => {
+    // Reconectar e mudar status para ONLINE
+    await updateUserStatus('ONLINE');
+    connect();
+  };
+
+  // Se o status é OFFLINE, mostrar tela de reconexão
+  if (currentUser?.status === 'OFFLINE') {
+    return (
+      <div className='flex h-screen bg-gray-50 items-center justify-center'>
+        <div className='text-center p-8 bg-white rounded-lg shadow-lg max-w-md'>
+          <div className='text-6xl mb-4'>💬</div>
+          <h2 className='text-2xl font-semibold text-gray-900 mb-2'>
+            Você está offline
+          </h2>
+          <p className='text-gray-600 mb-6'>
+            Reconecte-se para continuar conversando
+          </p>
+          <button
+            onClick={handleReconnect}
+            className='px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium'
+          >
+            Reconectar
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='flex h-screen bg-gray-50'>
       {/* Conversation List Sidebar */}
@@ -122,17 +165,17 @@ export function ChatPage() {
                 <Plus size={20} />
               </button>
             </div>
-            <div className='flex items-center gap-2'>
-              <div
-                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
-              />
-              <span className='text-sm text-gray-600'>
+            <div className='flex items-center justify-between'>
+              <span className='text-base font-medium text-gray-700'>
                 {currentUser
                   ? `${currentUser.firstName} ${currentUser.lastName}`.trim() ||
                     currentUser.email
-                  : ''}{' '}
-                - {isConnected ? 'Conectado' : 'Desconectado'}
+                  : ''}
               </span>
+              <StatusSelector
+                currentStatus={(currentUser?.status as UserStatus) || 'ONLINE'}
+                onStatusChange={handleStatusChange}
+              />
             </div>
           </div>
 

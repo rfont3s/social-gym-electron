@@ -96,6 +96,47 @@ export function ConversationList({
     );
   }
 
+  const getStatusColor = (status?: string, isOnline?: boolean) => {
+    // Para usuários invisíveis ou offline (não conectados via Socket.IO)
+    if (!isOnline || status === 'INVISIBLE' || status === 'OFFLINE') {
+      return 'bg-white border-2 border-gray-400';
+    }
+
+    // Para usuários online via Socket.IO, usar o status escolhido
+    switch (status) {
+      case 'BUSY':
+        return 'bg-red-500 border-2 border-white';
+      case 'AWAY':
+        return 'bg-yellow-500 border-2 border-white';
+      case 'ONLINE':
+      default:
+        return 'bg-green-500 border-2 border-white';
+    }
+  };
+
+  const getStatusText = (status?: string, isOnline?: boolean, lastSeen?: Date) => {
+    // Se não está online via Socket.IO, mostrar "Offline" ou última vez visto
+    if (!isOnline) {
+      return formatLastSeen(lastSeen);
+    }
+
+    // Se está online, mostrar o status escolhido
+    switch (status) {
+      case 'BUSY':
+        return 'Ocupado';
+      case 'AWAY':
+        return 'Ausente';
+      case 'OFFLINE':
+        return 'Offline';
+      case 'INVISIBLE':
+        // Para invisível, mostrar última vez visto ao invés de "Offline"
+        return formatLastSeen(lastSeen);
+      case 'ONLINE':
+      default:
+        return 'Online agora';
+    }
+  };
+
   return (
     <div className={`flex flex-col h-full overflow-hidden ${className}`}>
       <div className='flex-1 overflow-y-auto'>
@@ -104,6 +145,7 @@ export function ConversationList({
           const lastMessage = conversation.lastMessage;
           const otherUser = getOtherUser(conversation);
           const isOnline = otherUser?.isOnline || false;
+          const userStatus = otherUser?.status;
 
           return (
             <div
@@ -121,7 +163,7 @@ export function ConversationList({
                   </div>
                   {otherUser && (
                     <div
-                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${isOnline ? 'bg-green-500 border-2 border-white' : 'bg-white border-2 border-gray-400'}`}
+                      className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full ${getStatusColor(userStatus, isOnline)}`}
                     ></div>
                   )}
                 </div>
@@ -146,9 +188,7 @@ export function ConversationList({
                   ) : (
                     otherUser && (
                       <p className='text-xs text-gray-500 truncate'>
-                        {isOnline
-                          ? 'Online agora'
-                          : formatLastSeen(otherUser.lastSeen)}
+                        {getStatusText(userStatus, isOnline, otherUser.lastSeen)}
                       </p>
                     )
                   )}

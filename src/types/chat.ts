@@ -7,6 +7,7 @@ export interface User {
   isOnline?: boolean;
   lastSeen?: Date;
   profilePicture?: string;
+  status?: string;
 }
 
 export interface Conversation {
@@ -230,4 +231,5 @@ export interface ChatContextValue extends ChatState {
   // Socket connection
   connect: () => void;
   disconnect: () => void;
+  updateUserStatus: (status: 'ONLINE' | 'BUSY' | 'AWAY' | 'OFFLINE' | 'INVISIBLE') => Promise<void>;
 }

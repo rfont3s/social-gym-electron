@@ -145,6 +145,11 @@ export class SocketService {
       }
     );
 
+    // User status change (ONLINE, BUSY, AWAY, OFFLINE, INVISIBLE)
+    this.socket.on('user_status_change', (data: { userId: number; status: string }) => {
+      this.emit('user_status_change', data);
+    });
+
     // Conversation events
     this.socket.on(
       SocketEvents.CONVERSATION_CREATED,

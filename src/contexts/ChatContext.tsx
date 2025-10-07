@@ -85,21 +85,55 @@ export function ChatProvider({
         user.id
       );
 
-      // Set current user in state
-      setState(prev => ({
-        ...prev,
-        currentUser: {
-          id: Number(user.id),
-          firstName: user.name.split(' ')[0] || '',
-          lastName: user.name.split(' ').slice(1).join(' ') || '',
-          email: user.email,
-          profilePicture: user.picture,
-        },
-      }));
+      // Load user data from backend to get the status
+      const loadUserData = async () => {
+        try {
+          // Set temporary user data from Auth
+          const tempUser = {
+            id: Number(user.id),
+            firstName: user.name.split(' ')[0] || '',
+            lastName: user.name.split(' ').slice(1).join(' ') || '',
+            email: user.email,
+            profilePicture: user.picture,
+            status: 'ONLINE', // Default status
+          };
 
-      const token = getAuthToken?.() || undefined;
-      const userId = Number(user.id);
-      socketService.connect(token, userId);
+          setState(prev => ({
+            ...prev,
+            currentUser: tempUser,
+          }));
+
+          // Load full user data from backend to get status
+          const userResponse = await apiService.getUserById(Number(user.id));
+
+          if (userResponse.data) {
+            console.log('[ChatContext] Loaded user status from backend:', userResponse.data.status);
+            setState(prev => ({
+              ...prev,
+              currentUser: userResponse.data,
+            }));
+
+            // If status is OFFLINE, don't connect socket
+            if (userResponse.data.status === 'OFFLINE') {
+              console.log('[ChatContext] User status is OFFLINE, skipping socket connection');
+              return;
+            }
+          }
+
+          // Connect socket if not OFFLINE
+          const token = getAuthToken?.() || undefined;
+          const userId = Number(user.id);
+          socketService.connect(token, userId);
+        } catch (error) {
+          console.error('[ChatContext] Error loading user data:', error);
+          // On error, connect anyway
+          const token = getAuthToken?.() || undefined;
+          const userId = Number(user.id);
+          socketService.connect(token, userId);
+        }
+      };
+
+      loadUserData();
 
       // Handle window/app close
       const handleBeforeUnload = () => {
@@ -123,6 +157,7 @@ export function ChatProvider({
     autoConnect,
     getAuthToken,
     socketService,
+    apiService,
   ]);
 
   // Setup socket event listeners
@@ -383,6 +418,47 @@ export function ChatProvider({
       }
     );
 
+    // Atualizar status do usuário (ONLINE, BUSY, AWAY, etc)
+    socketService.on('user_status_change', (data: { userId: number; status: string }) => {
+      console.log('[ChatContext] User status change:', data);
+      setState(prev => {
+        const conversations = prev.conversations.map(conv => {
+          const participants = conv.participants?.map(p => {
+            if (p.userId === data.userId) {
+              return {
+                ...p,
+                user: {
+                  ...p.user,
+                  status: data.status,
+                }
+              };
+            }
+            return p;
+          });
+          return { ...conv, participants };
+        });
+
+        let activeConversation = prev.activeConversation;
+        if (activeConversation) {
+          const participants = activeConversation.participants?.map(p => {
+            if (p.userId === data.userId) {
+              return {
+                ...p,
+                user: {
+                  ...p.user,
+                  status: data.status,
+                }
+              };
+            }
+            return p;
+          });
+          activeConversation = { ...activeConversation, participants };
+        }
+
+        return { ...prev, conversations, activeConversation };
+      });
+    });
+
     // Atualizar status online periodicamente (a cada 5 segundos)
     const interval = setInterval(updateOnlineStatus, 5000);
 
@@ -408,8 +484,29 @@ export function ChatProvider({
   }, [socketService, getAuthToken, user]);
 
   const disconnect = useCallback(() => {
+    console.log('[ChatContext] Disconnect called');
     socketService.disconnect();
   }, [socketService]);
+
+  const updateUserStatus = useCallback(async (status: 'ONLINE' | 'BUSY' | 'AWAY' | 'OFFLINE' | 'INVISIBLE') => {
+    try {
+      console.log('[ChatContext] Updating user status to:', status);
+      await apiService.updateUserStatus(status, user?.id);
+
+      // Atualizar o estado local do currentUser
+      setState(prev => ({
+        ...prev,
+        currentUser: prev.currentUser ? {
+          ...prev.currentUser,
+          status,
+        } : undefined,
+      }));
+
+      console.log('[ChatContext] User status updated successfully');
+    } catch (error) {
+      console.error('[ChatContext] Error updating user status:', error);
+    }
+  }, [apiService, user?.id]);
 
   const loadConversations = useCallback(async () => {
     try {
@@ -721,6 +818,7 @@ export function ChatProvider({
     uploadFile,
     connect,
     disconnect,
+    updateUserStatus,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;

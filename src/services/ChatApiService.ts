@@ -226,6 +226,22 @@ export class ChatApiService {
     return response.data;
   }
 
+  // Get user by ID
+  async getUserById(userId: number): Promise<ApiResponse<any>> {
+    const response: AxiosResponse<ApiResponse<any>> = await this.api.get(`/chat/user/${userId}`);
+    return response.data;
+  }
+
+  // Update user status
+  async updateUserStatus(status: 'ONLINE' | 'BUSY' | 'AWAY' | 'OFFLINE' | 'INVISIBLE', userId?: number): Promise<ApiResponse<void>> {
+    const response: AxiosResponse<ApiResponse<void>> = await this.api.post(
+      '/chat/status',
+      { status },
+      { params: { userId } }
+    );
+    return response.data;
+  }
+
   // Utility method to get file URL
   getFileUrl(fileName: string): string {
     return `${this.api.defaults.baseURL}/files/${fileName}`;
