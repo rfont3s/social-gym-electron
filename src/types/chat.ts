@@ -17,6 +17,7 @@ export interface Conversation {
   messages: Message[];
   lastMessage?: Message;
   unreadCount?: number;
+  onlineCount?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,64 +69,74 @@ export interface MessageReaction {
   createdAt: Date;
 }
 
-export enum ConversationType {
-  DIRECT = 'DIRECT',
-  GROUP = 'GROUP',
-}
+export const ConversationType = {
+  DIRECT: 'DIRECT',
+  GROUP: 'GROUP',
+} as const;
 
-export enum ParticipantRole {
-  MEMBER = 'MEMBER',
-  ADMIN = 'ADMIN',
-}
+export type ConversationType =
+  (typeof ConversationType)[keyof typeof ConversationType];
 
-export enum MessageType {
-  TEXT = 'TEXT',
-  IMAGE = 'IMAGE',
-  FILE = 'FILE',
-  AUDIO = 'AUDIO',
-  VIDEO = 'VIDEO',
-}
+export const ParticipantRole = {
+  MEMBER: 'MEMBER',
+  ADMIN: 'ADMIN',
+} as const;
 
-export enum SocketEvents {
+export type ParticipantRole =
+  (typeof ParticipantRole)[keyof typeof ParticipantRole];
+
+export const MessageType = {
+  TEXT: 'TEXT',
+  IMAGE: 'IMAGE',
+  FILE: 'FILE',
+  AUDIO: 'AUDIO',
+  VIDEO: 'VIDEO',
+} as const;
+
+export type MessageType = (typeof MessageType)[keyof typeof MessageType];
+
+export const SocketEvents = {
   // Connection
-  CONNECT = 'connect',
-  DISCONNECT = 'disconnect',
-  JOIN_CONVERSATION = 'join_conversation',
-  LEAVE_CONVERSATION = 'leave_conversation',
+  CONNECT: 'connect',
+  DISCONNECT: 'disconnect',
+  JOIN_CONVERSATION: 'join_conversation',
+  LEAVE_CONVERSATION: 'leave_conversation',
 
   // Messages
-  SEND_MESSAGE = 'send_message',
-  MESSAGE_SENT = 'message_sent',
-  NEW_MESSAGE = 'new_message',
-  MESSAGE_UPDATED = 'message_updated',
-  MESSAGE_DELETED = 'message_deleted',
+  SEND_MESSAGE: 'send_message',
+  MESSAGE_SENT: 'message_sent',
+  NEW_MESSAGE: 'new_message',
+  MESSAGE_UPDATED: 'message_updated',
+  MESSAGE_DELETED: 'message_deleted',
 
   // Typing
-  TYPING_START = 'typing_start',
-  TYPING_STOP = 'typing_stop',
-  USER_TYPING = 'user_typing',
-  USER_STOPPED_TYPING = 'user_stopped_typing',
+  TYPING_START: 'typing_start',
+  TYPING_STOP: 'typing_stop',
+  USER_TYPING: 'user_typing',
+  USER_STOPPED_TYPING: 'user_stopped_typing',
 
   // Read receipts
-  MARK_AS_READ = 'mark_as_read',
-  MESSAGE_READ = 'message_read',
+  MARK_AS_READ: 'mark_as_read',
+  MESSAGE_READ: 'message_read',
 
   // User status
-  USER_ONLINE = 'user_online',
-  USER_OFFLINE = 'user_offline',
+  USER_ONLINE: 'user_online',
+  USER_OFFLINE: 'user_offline',
 
   // Conversations
-  CONVERSATION_CREATED = 'conversation_created',
-  CONVERSATION_UPDATED = 'conversation_updated',
-  USER_JOINED_CONVERSATION = 'user_joined_conversation',
-  USER_LEFT_CONVERSATION = 'user_left_conversation',
+  CONVERSATION_CREATED: 'conversation_created',
+  CONVERSATION_UPDATED: 'conversation_updated',
+  USER_JOINED_CONVERSATION: 'user_joined_conversation',
+  USER_LEFT_CONVERSATION: 'user_left_conversation',
 
   // Reactions
-  ADD_REACTION = 'add_reaction',
-  REMOVE_REACTION = 'remove_reaction',
-  REACTION_ADDED = 'reaction_added',
-  REACTION_REMOVED = 'reaction_removed',
-}
+  ADD_REACTION: 'add_reaction',
+  REMOVE_REACTION: 'remove_reaction',
+  REACTION_ADDED: 'reaction_added',
+  REACTION_REMOVED: 'reaction_removed',
+} as const;
+
+export type SocketEvents = (typeof SocketEvents)[keyof typeof SocketEvents];
 
 export interface SocketMessage {
   conversationId: string;
@@ -199,17 +210,21 @@ export interface ChatContextValue extends ChatState {
     conversationId: string,
     content: string,
     messageType?: MessageType,
-    replyToId?: string,
+    replyToId?: string
   ) => Promise<void>;
   loadConversations: () => Promise<void>;
-  loadMessages: (conversationId: string, page?: number) => Promise<void>;
-  createConversation: (participants: number[], name?: string) => Promise<Conversation>;
+  loadMessages: (conversationId: string, page?: number) => Promise<Message[]>;
+  createConversation: (
+    participants: number[],
+    name?: string,
+    type?: ConversationType
+  ) => Promise<Conversation>;
   markAsRead: (conversationId: string, messageId: string) => Promise<void>;
   startTyping: (conversationId: string) => void;
   stopTyping: (conversationId: string) => void;
   addReaction: (messageId: string, emoji: string) => Promise<void>;
   removeReaction: (messageId: string, emoji: string) => Promise<void>;
-  setActiveConversation: (conversation?: Conversation) => void;
+  setActiveConversation: (conversation?: Conversation) => Promise<void>;
   uploadFile: (file: File, conversationId: string) => Promise<void>;
 
   // Socket connection

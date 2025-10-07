@@ -11,6 +11,7 @@ import type {
 } from '../types/chat';
 import { SocketEvents } from '../types/chat';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type SocketEventCallback = (...args: any[]) => void;
 
 export class SocketService {
@@ -32,7 +33,7 @@ export class SocketService {
       return;
     }
 
-    const socketOptions: any = {
+    const socketOptions: Record<string, unknown> = {
       autoConnect: true,
       transports: ['websocket', 'polling'],
     };
@@ -42,7 +43,10 @@ export class SocketService {
     }
 
     if (userId) {
-      socketOptions.auth = { ...socketOptions.auth, userId };
+      socketOptions.auth = {
+        ...(socketOptions.auth as Record<string, unknown>),
+        userId,
+      };
     }
 
     console.log('[SocketService] Connecting with userId:', userId);
@@ -72,7 +76,7 @@ export class SocketService {
       this.emit('connect');
     });
 
-    this.socket.on('disconnect', (reason) => {
+    this.socket.on('disconnect', reason => {
       console.log('Socket disconnected:', reason);
       this.emit('disconnect', reason);
 
@@ -82,7 +86,7 @@ export class SocketService {
       }
     });
 
-    this.socket.on('connect_error', (error) => {
+    this.socket.on('connect_error', error => {
       console.error('Socket connection error:', error);
       this.emit('connect_error', error);
       this.handleReconnect();
@@ -106,17 +110,23 @@ export class SocketService {
       SocketEvents.MESSAGE_READ,
       (data: { messageId: string; userId: number; readAt: Date }) => {
         this.emit(SocketEvents.MESSAGE_READ, data);
-      },
+      }
     );
 
     // Typing events
-    this.socket.on(SocketEvents.USER_TYPING, (data: TypingData & { user: User }) => {
-      this.emit(SocketEvents.USER_TYPING, data);
-    });
+    this.socket.on(
+      SocketEvents.USER_TYPING,
+      (data: TypingData & { user: User }) => {
+        this.emit(SocketEvents.USER_TYPING, data);
+      }
+    );
 
-    this.socket.on(SocketEvents.USER_STOPPED_TYPING, (data: TypingData & { user: User }) => {
-      this.emit(SocketEvents.USER_STOPPED_TYPING, data);
-    });
+    this.socket.on(
+      SocketEvents.USER_STOPPED_TYPING,
+      (data: TypingData & { user: User }) => {
+        this.emit(SocketEvents.USER_STOPPED_TYPING, data);
+      }
+    );
 
     // User status events
     this.socket.on(SocketEvents.USER_ONLINE, (user: User) => {
@@ -128,46 +138,60 @@ export class SocketService {
     });
 
     // User online status change (real-time from Socket.IO)
-    this.socket.on('user_online_status', (data: { userId: number; isOnline: boolean }) => {
-      this.emit('user_online_status', data);
-    });
+    this.socket.on(
+      'user_online_status',
+      (data: { userId: number; isOnline: boolean }) => {
+        this.emit('user_online_status', data);
+      }
+    );
 
     // Conversation events
-    this.socket.on(SocketEvents.CONVERSATION_CREATED, (conversation: Conversation) => {
-      this.emit(SocketEvents.CONVERSATION_CREATED, conversation);
-    });
+    this.socket.on(
+      SocketEvents.CONVERSATION_CREATED,
+      (conversation: Conversation) => {
+        this.emit(SocketEvents.CONVERSATION_CREATED, conversation);
+      }
+    );
 
-    this.socket.on(SocketEvents.CONVERSATION_UPDATED, (conversation: Conversation) => {
-      this.emit(SocketEvents.CONVERSATION_UPDATED, conversation);
-    });
+    this.socket.on(
+      SocketEvents.CONVERSATION_UPDATED,
+      (conversation: Conversation) => {
+        this.emit(SocketEvents.CONVERSATION_UPDATED, conversation);
+      }
+    );
 
     this.socket.on(
       SocketEvents.USER_JOINED_CONVERSATION,
       (data: { conversationId: string; user: User }) => {
         this.emit(SocketEvents.USER_JOINED_CONVERSATION, data);
-      },
+      }
     );
 
     this.socket.on(
       SocketEvents.USER_LEFT_CONVERSATION,
       (data: { conversationId: string; user: User }) => {
         this.emit(SocketEvents.USER_LEFT_CONVERSATION, data);
-      },
+      }
     );
 
     // Reaction events
     this.socket.on(
       SocketEvents.REACTION_ADDED,
-      (data: { messageId: string; userId: number; emoji: string; user: User }) => {
+      (data: {
+        messageId: string;
+        userId: number;
+        emoji: string;
+        user: User;
+      }) => {
         this.emit(SocketEvents.REACTION_ADDED, data);
-      },
+      }
     );
 
     this.socket.on(
       SocketEvents.REACTION_REMOVED,
       (data: { messageId: string; userId: number; emoji: string }) => {
         this.emit(SocketEvents.REACTION_REMOVED, data);
-      },
+      }
     );
   }
 
@@ -182,7 +206,7 @@ export class SocketService {
 
     setTimeout(() => {
       console.log(
-        `Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+        `Attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`
       );
       this.socket?.connect();
     }, delay);
@@ -211,10 +235,10 @@ export class SocketService {
     }
   }
 
-  private emit(event: string, ...args: any[]): void {
+  private emit(event: string, ...args: unknown[]): void {
     const listeners = this.eventListeners.get(event);
     if (listeners) {
-      listeners.forEach((callback) => callback(...args));
+      listeners.forEach(callback => callback(...args));
     }
   }
 
@@ -228,7 +252,10 @@ export class SocketService {
   }
 
   sendMessage(message: SocketMessage): void {
-    console.log('[SocketService] Sending message to conversation:', message.conversationId);
+    console.log(
+      '[SocketService] Sending message to conversation:',
+      message.conversationId
+    );
     this.socket?.emit(SocketEvents.SEND_MESSAGE, message);
   }
 
