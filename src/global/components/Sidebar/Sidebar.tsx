@@ -87,9 +87,9 @@ export const Sidebar: React.FC = () => {
           />
         </svg>
       ),
-      label: 'Mensagens',
-      path: '/messages',
-      active: location.pathname === '/messages',
+      label: 'Chat',
+      path: '/chat',
+      active: location.pathname === '/chat',
     },
     {
       icon: (

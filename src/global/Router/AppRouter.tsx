@@ -1,5 +1,5 @@
 import { useAuth } from '@/global/hooks/useAuth';
-import { Dashboard, Feed, Login, Register } from '@pages';
+import { ChatPage, Dashboard, Feed, Login, Register } from '@pages';
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 // Componente para rotas protegidas
@@ -97,6 +97,16 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Rota do chat (protegida) */}
+      <Route
+        path='/chat'
+        element={
+          <ProtectedRoute>
+            <ChatPage />
           </ProtectedRoute>
         }
       />
