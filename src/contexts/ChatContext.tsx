@@ -743,43 +743,31 @@ export function ChatProvider({
         socketService.joinConversation(conversation.id);
         // Load messages for this conversation and get them returned
         const messages = await loadMessages(conversation.id);
-        console.log(
-          '[ChatContext] Loaded messages for marking as read:',
-          messages.length
-        );
 
         // Mark ALL unread messages as read
         if (user?.id && messages.length > 0) {
-          console.log('[ChatContext] User ID:', user.id);
           // Get all messages that haven't been read by current user
           const unreadMessages = messages.filter(msg => {
             // Skip own messages
             if (msg.senderId === user.id) {
-              console.log('[ChatContext] Skipping own message:', msg.id);
               return false;
             }
             // Check if already read
             const hasRead = msg.readBy?.some(read => read.userId === user.id);
-            console.log(
-              '[ChatContext] Message',
-              msg.id,
-              'hasRead:',
-              hasRead,
-              'readBy:',
-              msg.readBy
-            );
             return !hasRead;
           });
 
-          console.log(
-            '[ChatContext] Found',
-            unreadMessages.length,
-            'unread messages to mark as read'
-          );
+          // Only log if there are messages to mark as read
+          if (unreadMessages.length > 0) {
+            console.log(
+              '[ChatContext] Marking',
+              unreadMessages.length,
+              'unread messages as read'
+            );
+          }
 
           // Mark each unread message as read
           for (const msg of unreadMessages) {
-            console.log('[ChatContext] Marking message as read:', msg.id);
             await markAsRead(conversation.id, msg.id);
           }
         }
