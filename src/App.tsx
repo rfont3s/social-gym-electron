@@ -14,8 +14,8 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <ChatProvider
-            apiBaseUrl={import.meta.env.VITE_API_URL || 'http://localhost:3000/api'}
-            socketUrl={import.meta.env.VITE_SOCKET_URL || 'http://localhost:3000'}
+            apiBaseUrl={import.meta.env.VITE_API_URL || 'http://localhost:3001/api'}
+            socketUrl={import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001'}
             getAuthToken={getAuthToken}
             autoConnect={true}
           >

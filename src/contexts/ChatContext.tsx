@@ -387,46 +387,7 @@ export function ChatProvider({
       }
     );
 
-    // User online status - atualizar baseado na lista de usuários online
-    const updateOnlineStatus = async () => {
-      try {
-        const response = await apiService.getOnlineUsers();
-        const onlineUserIds = response.data || [];
-
-        setState(prev => {
-          const conversations = prev.conversations.map(conv => {
-            const participants = conv.participants?.map(p => ({
-              ...p,
-              user: {
-                ...p.user,
-                // Não marcar como online se o status for INVISIBLE
-                isOnline: onlineUserIds.includes(p.userId) && p.user.status !== 'INVISIBLE',
-              },
-            }));
-            return { ...conv, participants };
-          });
-
-          let activeConversation = prev.activeConversation;
-          if (activeConversation) {
-            const participants = activeConversation.participants?.map(p => ({
-              ...p,
-              user: {
-                ...p.user,
-                // Não marcar como online se o status for INVISIBLE
-                isOnline: onlineUserIds.includes(p.userId) && p.user.status !== 'INVISIBLE',
-              },
-            }));
-            activeConversation = { ...activeConversation, participants };
-          }
-
-          return { ...prev, conversations, activeConversation };
-        });
-      } catch (error) {
-        console.error('[ChatContext] Error fetching online users:', error);
-      }
-    };
-
-    // Atualizar status online quando receber evento
+    // Atualizar status online quando receber evento via Socket.IO
     socketService.on(
       'user_online_status',
       (data: { userId: number; isOnline: boolean }) => {
@@ -683,11 +644,7 @@ export function ChatProvider({
       });
     });
 
-    // Atualizar status online periodicamente (a cada 5 segundos)
-    const interval = setInterval(updateOnlineStatus, 5000);
-
     return () => {
-      clearInterval(interval);
       socketService.off('connect');
       socketService.off('disconnect');
       socketService.off('connect_error');

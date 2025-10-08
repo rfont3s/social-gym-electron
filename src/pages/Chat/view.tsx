@@ -300,7 +300,7 @@ export function ChatPage() {
           </>
         ) : (
           /* Empty State */
-          <div className='flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400'>
+          <div className='flex-1 h-full flex items-center justify-center text-gray-500 dark:text-gray-400'>
             <div className='text-center'>
               <div className='text-6xl mb-4'>💬</div>
               <h3 className='text-xl font-medium mb-2 text-gray-900 dark:text-gray-100'>
