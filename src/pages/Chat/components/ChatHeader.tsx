@@ -1,4 +1,4 @@
-import { Users, BellOff, Bell } from 'lucide-react';
+import { Users, BellOff, Bell, ArrowLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import type { Conversation, User } from '../../../types/chat';
 import { ConversationType } from '../../../types/chat';
@@ -8,9 +8,10 @@ interface ChatHeaderProps {
   currentUser?: User;
   onManageMembers?: () => void;
   onMuteConversation?: (duration: 'day' | 'week' | 'forever' | null) => void;
+  onBackToList?: () => void;
 }
 
-export function ChatHeader({ conversation, currentUser, onManageMembers, onMuteConversation }: ChatHeaderProps) {
+export function ChatHeader({ conversation, currentUser, onManageMembers, onMuteConversation, onBackToList }: ChatHeaderProps) {
   const [showMuteMenu, setShowMuteMenu] = useState(false);
 
   // Check if conversation is muted for current user
@@ -53,6 +54,16 @@ export function ChatHeader({ conversation, currentUser, onManageMembers, onMuteC
   return (
     <div className="border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-4">
       <div className="flex items-center gap-3">
+        {/* Back button for mobile */}
+        {onBackToList && (
+          <button
+            onClick={onBackToList}
+            className="md:hidden p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            title="Voltar para lista"
+          >
+            <ArrowLeft size={20} className="text-gray-600 dark:text-gray-400" />
+          </button>
+        )}
         {isGroup ? (
           // Avatares sobrepostos para grupos
           <div className='relative w-10 h-10 flex-shrink-0'>

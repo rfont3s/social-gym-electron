@@ -81,13 +81,6 @@ export function ConversationList({
     return `há ${diffInWeeks} semana${diffInWeeks > 1 ? 's' : ''}`;
   };
 
-  const formatLastSeen = (lastSeen?: Date) => {
-    const timeDiff = formatTimeDiff(lastSeen);
-    if (!timeDiff) return 'Offline';
-
-    if (timeDiff === 'agora mesmo') return 'Online agora';
-    return `Visto ${timeDiff}`;
-  };
 
   if (conversations.length === 0) {
     return (
@@ -235,10 +228,10 @@ export function ConversationList({
                       </span>
                     )}
                   </div>
-                  {conversation.unreadCount > 0 ? (
+                  {(conversation.unreadCount || 0) > 0 ? (
                     <p className='text-[10px] text-gray-900 dark:text-gray-100 font-semibold truncate'>
                       {conversation.unreadCount}{' '}
-                      {conversation.unreadCount === 1
+                      {(conversation.unreadCount || 0) === 1
                         ? 'nova mensagem'
                         : 'novas mensagens'}
                     </p>

@@ -80,7 +80,6 @@ export function GroupMembersModal({
     try {
       await onAddMember(userId);
       setSearchTerm('');
-      setSearchResults([]);
     } catch (error) {
       console.error('Error adding member:', error);
     } finally {

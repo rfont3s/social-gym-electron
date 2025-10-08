@@ -23,8 +23,8 @@ const ChatContext = createContext<ChatContextValue | null>(null);
 
 export function ChatProvider({
   children,
-  apiBaseUrl = 'http://localhost:3000/api',
-  socketUrl = 'http://localhost:3000',
+  apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api',
+  socketUrl = import.meta.env.VITE_SOCKET_URL || 'http://localhost:3001',
   getAuthToken,
   autoConnect = true,
 }: ChatProviderProps) {
@@ -638,6 +638,18 @@ export function ChatProvider({
         }
       } catch (error) {
         console.error('[ChatContext] Error reloading conversations:', error);
+      }
+    });
+
+    // Conversation created event (for groups)
+    socketService.on('conversation_created', async (conversation: Conversation) => {
+      console.log('[ChatContext] Received conversation_created event:', conversation.id);
+
+      try {
+        // Reload conversations to get the new group
+        await loadConversations();
+      } catch (error) {
+        console.error('[ChatContext] Error reloading conversations after group creation:', error);
       }
     });
 

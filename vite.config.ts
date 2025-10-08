@@ -22,6 +22,8 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: true,
+    host: true,
+    allowedHosts: ['social-gym-front.ngrok.dev'],
   },
   resolve: {
     alias: {

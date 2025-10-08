@@ -42,7 +42,8 @@ export function NewConversationModal({
       setError(null);
 
       // Fetch users from backend
-      const response = await fetch('http://localhost:3000/users');
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${apiUrl}/chat/users`);
 
       if (!response.ok) {
         throw new Error('Failed to fetch users');

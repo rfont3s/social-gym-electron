@@ -41,6 +41,7 @@ export function ChatPage() {
     useState(false);
   const [isGroupMembersModalOpen, setIsGroupMembersModalOpen] =
     useState(false);
+  const [showChatOnMobile, setShowChatOnMobile] = useState(false);
 
   // Load conversations on mount
   useEffect(() => {
@@ -113,9 +114,19 @@ export function ChatPage() {
         conversationType
       );
       setActiveConversation(newConversation);
+      setShowChatOnMobile(true);
     } catch (error) {
       console.error('Error creating/opening conversation:', error);
     }
+  };
+
+  const handleConversationSelect = (conversation: any) => {
+    setActiveConversation(conversation);
+    setShowChatOnMobile(true);
+  };
+
+  const handleBackToList = () => {
+    setShowChatOnMobile(false);
   };
 
   const handleStatusChange = async (status: UserStatus) => {
@@ -199,7 +210,7 @@ export function ChatPage() {
   return (
     <div className='flex h-screen bg-gray-50 dark:bg-gray-900'>
       {/* Conversation List Sidebar */}
-      <div className='w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700'>
+      <div className={`${showChatOnMobile ? 'hidden md:block' : 'block'} w-full md:w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700`}>
         <div className='h-full flex flex-col'>
           {/* Header */}
           <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
@@ -249,7 +260,7 @@ export function ChatPage() {
               conversations={conversations}
               currentUser={currentUser}
               activeConversation={activeConversation}
-              onConversationSelect={setActiveConversation}
+              onConversationSelect={handleConversationSelect}
               className='flex-1'
             />
           )}
@@ -257,7 +268,7 @@ export function ChatPage() {
       </div>
 
       {/* Chat Area */}
-      <div className='flex-1 flex flex-col'>
+      <div className={`${showChatOnMobile ? 'block' : 'hidden md:block'} flex-1 flex flex-col`}>
         {activeConversation ? (
           <>
             {/* Chat Header */}
@@ -266,6 +277,7 @@ export function ChatPage() {
               currentUser={currentUser}
               onManageMembers={() => setIsGroupMembersModalOpen(true)}
               onMuteConversation={(duration) => muteConversation(activeConversation.id, duration)}
+              onBackToList={handleBackToList}
             />
 
             {/* Messages */}
@@ -322,8 +334,9 @@ export function ChatPage() {
           onSearchUsers={async (search) => {
             // Use the existing getUsers from ChatApiService
             console.log('[ChatPage] Searching users with term:', search);
+            const chatApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
             const chatApi = new (await import('../../services/ChatApiService')).ChatApiService(
-              'http://localhost:3001/api',
+              chatApiUrl,
               () => null
             );
             const response = await chatApi.getUsers(search);
